@@ -44,7 +44,7 @@ admin.site.index_title = 'Admin'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('exam/', include('medicines.urls')),
+    path('medicine/', include('medicines.urls')),
     path('auth/', include('djoser.urls')),
     # path('auth/', include('djoser.urls.jwt')),  //overided abd added more payload info in core app
     path('auth/', include('core.urls')),
