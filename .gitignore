@@ -2,7 +2,7 @@
 totalcareapi/settings/dev.py
 totalcareapi/settings/__pycache__
 totalcareapi/users/migrations
-totalcareapi/settings/dev.py
+# totalcareapi/settings/dev.py
 core/migrations/
 medicines/migrations/
 core/__pycache__/
@@ -10,3 +10,5 @@ medicines/__pycache__/
 users/__pycache__/
 totalcareapi/__pycache__/
 users/migrations/__pycache__/
+core/signals/__pycache__/
+

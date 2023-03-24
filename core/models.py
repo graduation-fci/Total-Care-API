@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from medicines.models import Medicine
 
 # Create your models here.
 
@@ -14,7 +15,7 @@ class User(AbstractUser):
   TYPE_PHARMACY = 'PHC'
 
   TYPE_CHOICES = [
-        (TYPE_PATIENT, 'Student'),
+        (TYPE_PATIENT, 'Patient'),
         (TYPE_DOCTOR, 'Doctor'),
         (TYPE_CLINIC,'Clinic'),
         (TYPE_PHARMACY, 'Pharmacy')
@@ -35,3 +36,12 @@ class Person(models.Model):
 
     class Meta:
         ordering = ['user__first_name', 'user__last_name']
+
+class MedicationProfile (models.Model):
+    medicine = models.ManyToManyField(Medicine,related_name='medicines')
+
+class Patient(Person):
+    MedicationProfile = models.ManyToManyField(MedicationProfile,related_name='medications', null=True)
+
+class Doctor(Person):
+    specialization = models.CharField(max_length=255)

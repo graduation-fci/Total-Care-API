@@ -25,4 +25,5 @@ class Medicine(models.Model):
     company = models.CharField(null=True, max_length=255, verbose_name="medicine company")
     parcode = models.BigIntegerField(null=True)
     def __str__(self) -> str:
-        return self.title
+        return self.name
+
