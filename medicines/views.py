@@ -29,9 +29,17 @@ class MedicineViewSet(ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
+        drug_names = request.data[0].pop('drug', []) if request.data else []  # Remove drug names from request data
+        drugs = []
+        for drug_name in drug_names:
+            try:
+                drug = Drug.objects.get(name=drug_name)
+            except Drug.DoesNotExist:
+                drug = Drug.objects.create(name=drug_name)
+            drugs.append(drug)
         serializer = MedicineSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        medicines = serializer.save()
+        medicines = serializer.save(drug=drugs)  # Pass the list of Drug objects to the serializer
         return Response(MedicineSerializer(medicines, many=True).data)
 
 

@@ -13,12 +13,12 @@ import json
 class DrugSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drug
-        fields = ['id', 'name']
+        fields = ['id','name']
 
 class MedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
         fields = ['id', 'name','name_ar','category','price','drug','company','parcode']
-        drug = DrugSerializer(many=True, read_only=True, source='drug.medicines')
+        drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
         
