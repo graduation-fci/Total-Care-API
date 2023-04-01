@@ -7,23 +7,23 @@ from medicines.models import Medicine
 
 
 class User(AbstractUser):
-  email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True)
 
-  TYPE_PATIENT = 'PAT'
-  TYPE_DOCTOR = 'DR'
-  TYPE_CLINIC = 'CL'
-  TYPE_PHARMACY = 'PHC'
+    TYPE_PATIENT = 'PAT'
+    TYPE_DOCTOR = 'DR'
+    TYPE_CLINIC = 'CL'
+    TYPE_PHARMACY = 'PHC'
 
-  TYPE_CHOICES = [
+    TYPE_CHOICES = [
         (TYPE_PATIENT, 'Patient'),
         (TYPE_DOCTOR, 'Doctor'),
-        (TYPE_CLINIC,'Clinic'),
+        (TYPE_CLINIC, 'Clinic'),
         (TYPE_PHARMACY, 'Pharmacy')
     ]
 
-  profile_type = models.CharField(
-        max_length=3, choices=TYPE_CHOICES, null= True)
-  
+    profile_type = models.CharField(
+        max_length=3, choices=TYPE_CHOICES, null=True)
+
 
 class Person(models.Model):
     phone = models.CharField(max_length=255)
@@ -37,11 +37,18 @@ class Person(models.Model):
     class Meta:
         ordering = ['user__first_name', 'user__last_name']
 
-class MedicationProfile (models.Model):
-    medicine = models.ManyToManyField(Medicine,related_name='medicines')
 
 class Patient(Person):
-    MedicationProfile = models.ManyToManyField(MedicationProfile,related_name='medications', null=True)
+    #change later to selectedoptions
+    bloodType = models.CharField(max_length=255)
+
+
+class MedicationProfile (models.Model):
+    medicine = models.ManyToManyField(Medicine, related_name='medicines')
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name='profiles')
+
 
 class Doctor(Person):
+    #change later to selectedoptions
     specialization = models.CharField(max_length=255)

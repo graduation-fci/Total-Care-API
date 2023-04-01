@@ -15,6 +15,8 @@ class DrugSerializer(serializers.ModelSerializer):
         model = Drug
         fields = ['id','name']
 
+#dont post single item outside bulk create
+#response with drugs equal to null
 class MedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine

@@ -12,8 +12,7 @@ import random
 from itertools import chain
 import json
 from medicines.models import Medicine
-from medicines.serializers import DrugSerializer,MedicineSerializer
-
+from medicines.serializers import DrugSerializer, MedicineSerializer
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -35,76 +34,77 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
-
-
-
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
         fields = ['id', 'username', 'password',
                   'email', 'first_name', 'last_name', 'profile_type']
-    
 
 
 class UserSerializerDAB(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile_type']
+        fields = ['id', 'username', 'email',
+                  'first_name', 'last_name', 'profile_type']
+
 
 class SimpleMedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
-        fields = ['name','name_ar','drug']
-        drug = DrugSerializer(many=True, read_only=True, source='drug.medicines')
+        fields = ['name', 'name_ar', 'drug']
+        drug = DrugSerializer(many=True, read_only=True,
+                              source='drug.medicines')
         depth = 1
 
+class MedicationProfileGetSerializer(serializers.ModelSerializer):
+    medicine = SimpleMedicineSerializer(many=True, read_only=True)
+    class Meta:
+        model = MedicationProfile
+        fields = ['medicine']
+        depth = 1
+       
 
 class MedicationProfileSerializer(serializers.ModelSerializer):
-    
-    # def create(self, validated_data):
-    #     user_id = self.context['user_id']
-    #     patient = Patient.objects.get(user_id=user_id)
-    #     return MedicationProfile.objects.create(patient = patient,**validated_data)
-    
+
+
+    medicines = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True
+    )
+
     def create(self, validated_data):
         user_id = self.context['user_id']
         patient = Patient.objects.get(user_id=user_id)
-        medication_profile = MedicationProfile.objects.create()
-        medication_profile.medicine.set(validated_data['medicine'])
-        medication_profile.medications.add(patient)
-        return medication_profile
-
-    medicine = SimpleMedicineSerializer(many=True)
+        medicines_data = validated_data.pop('medicines', [])
+        profile = MedicationProfile.objects.create(patient=patient, **validated_data)
+        for medicine_id in medicines_data:
+            try:
+                medicine = Medicine.objects.get(id=medicine_id)
+                profile.medicine.add(medicine)
+            except Medicine.DoesNotExist:
+                pass
+        return profile
 
     class Meta:
         model = MedicationProfile
-        fields = ['id','medicine']
-        
+        fields = ['id', 'medicines']
+
 
 class PatientSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
-    MedicationProfile = MedicationProfileSerializer(many=True, read_only=True)
+    profiles = MedicationProfileSerializer(many=True, read_only=True)
+
     class Meta:
         model = Patient
-        fields = ['id','user_id','phone','birth_date','MedicationProfile']
-        #MedicationProfile = MedicationProfileSerializer(many=True, read_only=True, source='drug.medicines')
+        fields = ['id', 'user_id', 'phone',
+                  'birth_date', 'profiles', 'bloodType']
+        # MedicationProfile = MedicationProfileSerializer(many=True, read_only=True, source='drug.medicines')
         depth = 1
+
 
 class PatientGetSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
+    profiles = MedicationProfileSerializer(many=True, read_only=True)
+
     class Meta:
         model = Patient
-        fields = ['id','user_id','phone','birth_date','MedicationProfile']
-        MedicationProfile = MedicationProfileSerializer(many=True, read_only=True, source='drug.medicines')
+        fields = ['id', 'user_id', 'phone', 'birth_date', 'profiles']
         depth = 1
-
-# class CreateMedicationProfileSerializer(serializers.ModelSerializer):
-
-#     def save(self, **kwargs):
-
-#         if self.context['is_staff']:
-#             return []
-#         with transaction.atomic():
-#             user_id = self.context['user_id']
-#             Patient = Patient.objects.get(user_id=self.context['user_id'])
-            
-#             MedicationProfile.objects.create(patient=Patient,medicine = )
-#             return MedicationProfile.objects.filter(exam_id=exam__id, student= student)
