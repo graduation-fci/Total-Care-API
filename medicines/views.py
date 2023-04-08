@@ -21,6 +21,7 @@ from medicines.graph_grpc import graph_pb2, graph_pb2_grpc
 import grpc
 from django.http import HttpResponse, JsonResponse
 import json
+from rest_framework.exceptions import ValidationError
 from google.protobuf.json_format import MessageToDict
 
 
@@ -45,10 +46,26 @@ class MedicineViewSet(ModelViewSet):
             except Drug.DoesNotExist:
                 drug = Drug.objects.create(name=drug_name)
             drugs.append(drug)
-        serializer = MedicineSerializer(data=request.data, many=True)
-        serializer.is_valid(raise_exception=True)
-        medicines = serializer.save(drug=drugs)  # Pass the list of Drug objects to the serializer
-        return Response(MedicineSerializer(medicines, many=True).data)
+
+        success_list = []
+        fail_list = []
+
+        for data in request.data:
+            try:
+                serializer = MedicineSerializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                medicine = serializer.save(drug=drugs)
+                success_list.append(medicine)
+            except ValidationError as e:
+                fail_list.append((data, str(e)))
+
+        response_data = {
+            'success': MedicineSerializer(success_list, many=True).data,
+            'fail': fail_list,
+            'success_count': len(success_list),
+            'fail_count': len(fail_list),
+        }
+        return Response(response_data)
 
 
 class DrugViewSet(ModelViewSet):
@@ -58,10 +75,26 @@ class DrugViewSet(ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
-        serializer = DrugSerializer(data=request.data, many=True)
-        serializer.is_valid(raise_exception=True)
-        drugs = serializer.save()
-        return Response(DrugSerializer(drugs, many=True).data)
+        success_list = []
+        fail_list = []
+
+        for data in request.data:
+            try:
+                serializer = DrugSerializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                drug = serializer.save()
+                success_list.append(drug)
+            except ValidationError as e:
+                fail_list.append((data, str(e)))
+
+        response_data = {
+            'success': DrugSerializer(success_list, many=True).data,
+            'fail': fail_list,
+            'success_count': len(success_list),
+            'fail_count': len(fail_list),
+        }
+        return Response(response_data)
+
     
 channel = grpc.insecure_channel('localhost:50051')
 
