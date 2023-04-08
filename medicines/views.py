@@ -63,7 +63,7 @@ class DrugViewSet(ModelViewSet):
         drugs = serializer.save()
         return Response(DrugSerializer(drugs, many=True).data)
     
-
+channel = grpc.insecure_channel('localhost:50051')
 
 class InteractionsViewSet(ViewSet):
     def create(self, request):
@@ -82,9 +82,6 @@ class InteractionsViewSet(ViewSet):
             my_med = graph_pb2.Medecine(name=graph_pb2.I18n(name_en=name_en,name_ar=name_ar), drugs=drugs)
             
             my_request.medecines.extend([my_med])
-
-        
-        channel = grpc.insecure_channel('localhost:50051')
 
         stub = graph_pb2_grpc.GraphServiceStub(channel)
 
