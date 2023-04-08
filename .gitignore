@@ -12,3 +12,4 @@ totalcareapi/__pycache__/
 users/migrations/__pycache__/
 core/signals/__pycache__/
 
+medicines/graph_grpc/__pycache__/

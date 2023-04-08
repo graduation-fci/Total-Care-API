@@ -17,7 +17,7 @@ from medicines.filters import MedicineFilter
 from .serializers import *
 from medicines.pagination import DefaultPagination
 from django.shortcuts import render
-from . import graph_pb2, graph_pb2_grpc
+from medicines.graph_grpc import graph_pb2, graph_pb2_grpc
 import grpc
 from django.http import HttpResponse, JsonResponse
 import json
