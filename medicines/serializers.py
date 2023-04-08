@@ -24,3 +24,14 @@ class MedicineSerializer(serializers.ModelSerializer):
         drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
         
+class InteractionSerializer(serializers.Serializer):
+    medecines = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
+    )
+    interactions = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
+    )

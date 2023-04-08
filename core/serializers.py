@@ -54,16 +54,17 @@ class SimpleMedicineSerializer(serializers.ModelSerializer):
                               source='drug.medicines')
         depth = 1
 
+
 class MedicationProfileGetSerializer(serializers.ModelSerializer):
     medicine = SimpleMedicineSerializer(many=True, read_only=True)
+
     class Meta:
         model = MedicationProfile
         fields = ['medicine']
         depth = 1
-       
+
 
 class MedicationProfileSerializer(serializers.ModelSerializer):
-
 
     medicines = serializers.ListField(
         child=serializers.IntegerField(),
@@ -74,7 +75,8 @@ class MedicationProfileSerializer(serializers.ModelSerializer):
         user_id = self.context['user_id']
         patient = Patient.objects.get(user_id=user_id)
         medicines_data = validated_data.pop('medicines', [])
-        profile = MedicationProfile.objects.create(patient=patient, **validated_data)
+        profile = MedicationProfile.objects.create(
+            patient=patient, **validated_data)
         for medicine_id in medicines_data:
             try:
                 medicine = Medicine.objects.get(id=medicine_id)

@@ -25,7 +25,9 @@ django-guardian = "*"
 django-extensions = "*"
 pydotplus = "*"
 drf-yasg = "*"
-
+grpcio = "*"
+protobuf = "*"
+grpcio-tools = "*"
 
 [dev-packages]
 

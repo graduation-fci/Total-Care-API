@@ -8,13 +8,21 @@ from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveM
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, \
     DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet , ViewSet
 from rest_framework import status
-
+import requests
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from medicines.filters import MedicineFilter
 from .serializers import *
 from medicines.pagination import DefaultPagination
 from django.shortcuts import render
+from . import graph_pb2, graph_pb2_grpc
+import grpc
+from django.http import HttpResponse, JsonResponse
+import json
+from google.protobuf.json_format import MessageToDict
+
 
 
 class MedicineViewSet(ModelViewSet):
@@ -54,3 +62,35 @@ class DrugViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         drugs = serializer.save()
         return Response(DrugSerializer(drugs, many=True).data)
+    
+
+
+class InteractionsViewSet(ViewSet):
+    def create(self, request):
+        data = request.data
+        medicines = data.get('medicine', [])
+        
+        #transformed_medicines = Operation.transform(medicines)
+
+        my_request = graph_pb2.CheckInteractionsRequest()
+        for medicine in medicines:
+            name_en = medicine.get('name', '')
+            name_ar = medicine.get('name_ar', '')
+            drugs = [drug.get('name', '') for drug in medicine.get('drug', [])]
+
+            
+            my_med = graph_pb2.Medecine(name=graph_pb2.I18n(name_en=name_en,name_ar=name_ar), drugs=drugs)
+            
+            my_request.medecines.extend([my_med])
+
+        
+        channel = grpc.insecure_channel('localhost:50051')
+
+        stub = graph_pb2_grpc.GraphServiceStub(channel)
+
+    
+        response = stub.CheckInteractions(my_request)
+        
+        response_dict = MessageToDict(response)
+        return Response(response_dict, status=status.HTTP_200_OK)
+
