@@ -1,0 +1,13 @@
+- handle bulk create functions handle exception * //done
+- patch and delete operations *
+- mock many to many medicine categories *
+- provide images to categories and products (statick-image-for-now) *
+- move (core) users end-points to their seperate app *
+- modify bulk ceate after each of the above * 
+
+- provide single view for medication profile
+- save report of checked_interaction if profile_id is provided (modify interactions view accordingly)
+- update the report by rechecking interactions every time a new medicine is added to medication profile
+- shopping cart and ordering services
+- provide admin views for users, orders
+

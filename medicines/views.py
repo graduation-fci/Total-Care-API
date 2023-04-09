@@ -22,6 +22,8 @@ import grpc
 from django.http import HttpResponse, JsonResponse
 import json
 from rest_framework.exceptions import ValidationError
+from django.db.models.deletion import ProtectedError
+
 from google.protobuf.json_format import MessageToDict
 
 
@@ -31,7 +33,6 @@ class MedicineViewSet(ModelViewSet):
     serializer_class = MedicineSerializer
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-
     filterset_class = MedicineFilter
     search_fields = ['name']
     ordering_fields = ['name', 'price']
@@ -66,6 +67,44 @@ class MedicineViewSet(ModelViewSet):
             'fail_count': len(fail_list),
         }
         return Response(response_data)
+    
+    @action(detail=False, methods=['PATCH'])
+    def bulk_patch(self, request):
+        success_list = []
+        fail_list = []
+        for data in request.data:
+            medicine = self.get_object().filter(id=data.pop('id')).first()
+            if not medicine:
+                fail_list.append({'id': data['id'], 'error': 'Medicine does not exist'})
+                continue  # Skip if the medicine does not exist
+            serializer = self.get_serializer(medicine, data=data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                success_list.append(serializer.save())
+            except serializers.ValidationError as e:
+                fail_list.append({'id': data['id'], 'error': str(e)})
+        return Response({
+            'updated': len(success_list),
+            'failed': len(fail_list),
+            'fail_list': fail_list,
+        })
+
+    @action(detail=False, methods=['DELETE'])
+    def bulk_delete(self, request):
+        medicine_ids = request.data.get('ids', [])  # Get the list of medicine ids to delete
+        deleted_medicines = []
+        failed_medicines = []
+        for medicine_id in medicine_ids:
+            try:
+                medicine = Medicine.objects.get(id=medicine_id)
+                medicine.delete()
+                deleted_medicines.append(medicine_id)
+            except Medicine.DoesNotExist:
+                failed_medicines.append({'id': medicine_id, 'error': 'Medicine not found'})
+            except ProtectedError:
+                failed_medicines.append({'id': medicine_id, 'error': 'Medicine is related to other models'})
+        response_data = {'deleted': deleted_medicines,'deleted_count' : len(deleted_medicines), 'failed': failed_medicines,'failed_count': len(failed_medicines) }
+        return Response(response_data)
 
 
 class DrugViewSet(ModelViewSet):
@@ -94,6 +133,34 @@ class DrugViewSet(ModelViewSet):
             'fail_count': len(fail_list),
         }
         return Response(response_data)
+    
+    @action(detail=False, methods=['PATCH'])
+    def bulk_patch(self, request):
+        success_list = []
+        fail_list = []
+        for data in request.data:
+            drug = self.get_object().filter(id=data.pop('id')).first()
+            if not drug:
+                fail_list.append({'id': data['id'], 'error': 'Drug does not exist'})
+                continue  # Skip if the drug does not exist
+            serializer = self.get_serializer(drug, data=data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                success_list.append(serializer.save())
+            except serializers.ValidationError as e:
+                fail_list.append({'id': data['id'], 'error': str(e)})
+        return Response({
+            'updated': len(success_list),
+            'failed': len(fail_list),
+            'fail_list': fail_list,
+        })
+
+    @action(detail=False, methods=['DELETE'])
+    def bulk_delete(self, request):
+        ids = request.data.get('ids', [])
+        drugs = self.get_queryset().filter(id__in=ids)
+        deleted_count, _ = drugs.delete()
+        return Response({'deleted': deleted_count})
 
     
 channel = grpc.insecure_channel('localhost:50051')

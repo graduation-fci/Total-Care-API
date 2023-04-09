@@ -87,35 +87,38 @@ class MedicationProfileViewSet(ModelViewSet):
 
     @action(detail=False, methods=['GET', 'PUT', 'PATCH','POST'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        patient = Patient.objects.get(user_id = self.request.user.id)
+        patient = Patient.objects.get(user_id=self.request.user.id)
         serializer_context = self.get_serializer_context()  # <-- call get_serializer_context
-       
+
         if request.method == 'GET':
-            serializer = MedicationProfileGetSerializer
             try:
-                profiles =  self.queryset.filter(patient_id = patient.id)
-                print(profiles)
+                profiles = self.queryset.filter(patient_id=patient.id)
             except:
                 raise serializers.ValidationError("You don't have profiles yet")
-            
-            serializer = MedicationProfileGetSerializer(profiles, context=serializer_context,many=True)  # <-- pass serializer_context
+
+            serializer = MedicationProfileGetSerializer(profiles, context=serializer_context, many=True)
             return Response(serializer.data)
-            
+
         elif request.method in ['PUT', 'PATCH']:
-            serializer = MedicationProfileSerializer
             try:
-                profile =  self.queryset.get(
-                    patient_id=patient.id)
+                profile = self.queryset.get(patient_id=patient.id, id=request.data.get('id'))
             except:
-                raise serializers.ValidationError("You don't have profiles yet")
-            serializer = MedicationProfileSerializer(profile, data=request.data, context=serializer_context)  # <-- pass serializer_context
+                raise serializers.ValidationError("Profile not found")
+
+            serializer = MedicationProfileSerializer(profile, data=request.data, context=serializer_context)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(serializer.data)
+
+            # return success and fail list length
+            success_length = len(serializer.validated_data)
+            fail_length = len(serializer.errors)
+
+            return Response({'success_length': success_length, 'fail_length': fail_length})
+
         elif request.method == 'POST':
-            serializer= MedicationProfileSerializer
-            serializer = MedicationProfileSerializer(data=request.data, context=serializer_context)  # <-- pass serializer_context
+            serializer = MedicationProfileSerializer(data=request.data, context=serializer_context)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
 
