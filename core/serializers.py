@@ -60,7 +60,7 @@ class MedicationProfileGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MedicationProfile
-        fields = ['medicine']
+        fields = ['id','medicine']
         depth = 1
 
 
