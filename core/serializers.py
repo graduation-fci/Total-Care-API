@@ -49,7 +49,7 @@ class UserSerializerDAB(BaseUserSerializer):
 class SimpleMedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
-        fields = ['name', 'name_ar', 'drug']
+        fields = ['id','name', 'name_ar', 'drug']
         drug = DrugSerializer(many=True, read_only=True,
                               source='drug.medicines')
         depth = 1
@@ -84,10 +84,18 @@ class MedicationProfileSerializer(serializers.ModelSerializer):
             except Medicine.DoesNotExist:
                 pass
         return profile
-
+    
+    def update(self, instance, validated_data):
+        # Update the fields on the instance object
+        instance.medicine.set(validated_data.get('medicines', []))
+        instance.save()
+        return instance
+    
     class Meta:
         model = MedicationProfile
         fields = ['id', 'medicines']
+        depth = 1
+
 
 
 class PatientSerializer(serializers.ModelSerializer):

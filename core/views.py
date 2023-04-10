@@ -40,82 +40,32 @@ class PatientViewSet(ModelViewSet):
             serializer.save()
             return Response(serializer.data)
 
-# class MedicationProfileViewSet(ModelViewSet):
-#     queryset = MedicationProfile.objects.all()
-#     serializer_class = MedicationProfileSerializer
-
-#     def get_serializer_context(self):
-#         return {'user_id': self.request.user.id}
-
-#     @action(detail=False, methods=['GET', 'PUT', 'PATCH','POST'], permission_classes=[IsAuthenticated])
-#     def me(self, request):
-#         patient = Patient.objects.get(user_id = self.request.user.id)
-       
-#         if request.method == 'GET':
-#             try:
-#                 profile =  self.queryset.get(
-#                     patient_id=patient.id)
-#             except:
-#                 raise serializers.ValidationError("You don't have profiles yet")
-            
-#             serializer = MedicationProfileSerializer(profile)
-#             return Response(serializer.data)
-            
-#         elif request.method == 'PUT':
-#             try:
-#                 profile =  self.queryset.get(
-#                     patient_id=patient.id)
-#             except:
-#                 raise serializers.ValidationError("You don't have profiles yet")
-#             serializer = MedicationProfileSerializer(profile, data=request.data)
-#             serializer.is_valid(raise_exception=True)
-#             serializer.save()
-#             return Response(serializer.data)
-#         elif request.method == 'POST':
-#             serializer = MedicationProfileSerializer(data=request.data)
-#             serializer.is_valid(raise_exception=True)
-#             serializer.save()
-#             return Response(serializer.data)
+class MedicationProfileViewSet(ModelViewSet):
+    pagination_class = DefaultPagination
+    # serializer_class = MedicationProfileSerializer
+    # filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    
+    # filterset_class = ResultFilter
     
 
-class MedicationProfileViewSet(ModelViewSet):
-    queryset = MedicationProfile.objects.all()
-    serializer_class = MedicationProfileGetSerializer
+    # def get_permissions(self):
+    #     if self.request.method in ['PATCH', 'DELETE','POST']:
+    #         return [IsAdminUser()]
+    #     return [IsAuthenticated()]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return MedicationProfileGetSerializer
+        return MedicationProfileSerializer
 
     def get_serializer_context(self):
-        return {'user_id': self.request.user.id}
+         return {'user_id': self.request.user.id}
 
-    @action(detail=False, methods=['GET', 'PUT', 'PATCH','POST'], permission_classes=[IsAuthenticated])
-    def me(self, request):
-        patient = Patient.objects.get(user_id = self.request.user.id)
-        serializer_context = self.get_serializer_context()  # <-- call get_serializer_context
-       
-        if request.method == 'GET':
-            serializer = MedicationProfileGetSerializer
-            try:
-                profiles =  self.queryset.filter(patient_id = patient.id)
-                print(profiles)
-            except:
-                raise serializers.ValidationError("You don't have profiles yet")
-            
-            serializer = MedicationProfileGetSerializer(profiles, context=serializer_context,many=True)  # <-- pass serializer_context
-            return Response(serializer.data)
-            
-        elif request.method in ['PUT', 'PATCH']:
-            serializer = MedicationProfileSerializer
-            try:
-                profile =  self.queryset.get(
-                    patient_id=patient.id)
-            except:
-                raise serializers.ValidationError("You don't have profiles yet")
-            serializer = MedicationProfileSerializer(profile, data=request.data, context=serializer_context)  # <-- pass serializer_context
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
-        elif request.method == 'POST':
-            serializer= MedicationProfileSerializer
-            serializer = MedicationProfileSerializer(data=request.data, context=serializer_context)  # <-- pass serializer_context
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return MedicationProfile.objects.all()
+        
+        patient_id = Patient.objects.only('id').get(user_id=user.id)
 
+        return MedicationProfile.objects.filter(patient_id = patient_id)

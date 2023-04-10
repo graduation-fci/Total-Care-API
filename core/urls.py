@@ -14,7 +14,7 @@ custompatterns= [
 
 router = routers.DefaultRouter()
 router.register('patients', views.PatientViewSet)
-router.register('medications', views.MedicationProfileViewSet)
+router.register('medications', views.MedicationProfileViewSet,basename="medications")
 
 
 urlpatterns = custompatterns + djoserpatterns + router.urls

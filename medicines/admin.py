@@ -11,14 +11,14 @@ from . import models
 
 @admin.register(models.Drug)
 class DrugAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['id','name']
     ordering = ['name']
     search_fields = ['name']
     list_filter = ['name']
 
 @admin.register(models.Medicine)
 class MedicineAdmin(admin.ModelAdmin):
-    list_display = ['__str__' , 'drugs_number']
+    list_display = ['__str__' , 'drugs_number','id']
     ordering = ['name']
     
     @admin.display(ordering='drugs_number')
