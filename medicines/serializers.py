@@ -26,13 +26,12 @@ class DrugSerializer(serializers.ModelSerializer):
 
 
 
-from rest_framework import serializers
-from .models import Image
+
 
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'medicine', 'category', 'image']
+        fields = ['id','image']
 
     def create(self, validated_data):
         image_path = validated_data.pop('image')
@@ -64,7 +63,9 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'name_ar', 'image_file']
 
     def create(self, validated_data):
+        print("entered")
         image_file = validated_data.pop('image_file', None)
+        print(image_file)
         category = super().create(validated_data)
         if image_file:
             category.image = self._upload_image(image_file)
@@ -94,43 +95,56 @@ class CategorySerializer(serializers.ModelSerializer):
 #dont post single item outside bulk create
 #response with drugs equal to null
 class MedicineSerializer(serializers.ModelSerializer):
-    
+    medicine_images = ImageSerializer(many = True)
+    category = CategoryGetSerializer(many = True)
     class Meta:
         model = Medicine
         fields = ['id', 'name','name_ar','category','price','drug','company','parcode','medicine_images']
         drug = DrugSerializer(many=True,source='drug.medicines')
-        medicine_images = ImageSerializer(many = True,source='image.medicine_images')
         depth = 1
-        
-class MedicineCreateSerializer(MedicineSerializer):
+
+class MedicineCreateSerializer(serializers.ModelSerializer):
+    image_files = serializers.ListField(child = serializers.CharField(),write_only=True, required=False)
+
+    class Meta:
+        model = Medicine
+        fields = ['id', 'name','name_ar','category','price','drug','company','parcode','image_files']
+        drug = DrugSerializer(many=True,source='drug.medicines')
+
     def create(self, validated_data):
+        print("entered")
         image_files = validated_data.pop('image_files', None)
+        print(image_files)
+        print("heyyyyyyy")
         med = super().create(validated_data)
-        med_imgs = []
         if image_files:
-            for image_file in image_files:
-                _image = self._upload_image(image_file)
-                med_imgs.append(_image)
-            med.medicine_images = med_imgs
-            med.save()
+            self.create_images(med, image_files)
         return med
 
     def update(self, instance, validated_data):
         image_files = validated_data.pop('image_files', None)
+        
         med = super().update(instance, validated_data)
-        med_imgs = []
         if image_files:
-            for image_file in image_files:
-                _image = self._upload_image(image_file)
-                med_imgs.append(_image)
-            med.medicine_images = med_imgs
-            med.save()
+            self.create_images(med, image_files)
+        return med
 
+    def create_images(self, med, image_files):
+        print("Creating images...")
+        med_imgs = []
+        for image_file in image_files:
+            _image = self._upload_image(image_file)
+            med_imgs.append(_image)
+        for img in med_imgs:
+            Image.objects.create(medicine=med, image=img)
+    
     def _upload_image(self, image_file):
         try:
             with open(image_file, 'rb') as f:
                 image_name = os.path.basename(image_file)
                 image_content = f.read()
-                return Image.objects.create(image=ContentFile(image_content, name=image_name))
-        except FileNotFoundError:
-            raise serializers.ValidationError('Image file not found')
+                return ContentFile(image_content, name=image_name)
+        except FileNotFoundError as e:
+            raise serializers.ValidationError(f'Image file not found: {image_file}. Error: {e}')
+
+

@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthentic
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet , ViewSet
 from rest_framework import status
+from django.core.files.uploadedfile import SimpleUploadedFile
 import requests
 import tempfile
 import base64
@@ -40,7 +41,7 @@ class MedicineViewSet(ModelViewSet):
     ordering_fields = ['name', 'price']
 
     def get_serializer_class(self):
-        if self.request.method == 'POST'or self.request.method == 'PATCH' :
+        if self.request.method == 'POST' or self.request.method == 'PATCH' :
             return MedicineCreateSerializer
         return MedicineSerializer
 
@@ -64,13 +65,19 @@ class MedicineViewSet(ModelViewSet):
                 
                 category_names = data.pop('category', []) if request.data else []  # Remove category names from request data
                 categories = []
+                
                 for category_name in category_names:
                     category = Category.objects.get(name=category_name)
                     categories.append(category)
+                print(category_names)
+                
 
-                serializer = MedicineSerializer(data=data)
+                serializer = MedicineCreateSerializer(data=data)
+                print(serializer)
                 serializer.is_valid(raise_exception=True)
+                print("valid")
                 medicine = serializer.save(drug=drugs,category=categories)
+                print("med")
                 success_list.append(medicine)
             except ValidationError as e:
                 fail_list.append((data, str(e)))
@@ -120,6 +127,106 @@ class MedicineViewSet(ModelViewSet):
                 failed_medicines.append({'id': medicine_id, 'error': 'Medicine is related to other models'})
         response_data = {'deleted': deleted_medicines,'deleted_count' : len(deleted_medicines), 'failed': failed_medicines,'failed_count': len(failed_medicines) }
         return Response(response_data)
+
+# class MedicineViewSet(ModelViewSet):
+#     queryset = Medicine.objects.prefetch_related('drug').all()
+#     pagination_class = DefaultPagination
+#     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+#     filterset_class = MedicineFilter
+#     search_fields = ['name']
+#     ordering_fields = ['name', 'price']
+
+#     def get_serializer_class(self):
+#         if self.request.method == 'POST' or self.request.method == 'PATCH' :
+#             return MedicineCreateSerializer
+#         return MedicineSerializer
+
+#     @action(detail=False, methods=['POST'])
+#     def bulk_create(self, request):
+#         success_list = []
+#         fail_list = []
+
+#         for data in request.data:
+#             try:
+#                 # Process drug names and categories as before
+#                 drug_names = data.pop('drug', []) if request.data else []
+#                 drugs = []
+#                 for drug_name in drug_names:
+#                     try:
+#                         drug = Drug.objects.get(name=drug_name)
+#                     except Drug.DoesNotExist:
+#                         drug = Drug.objects.create(name=drug_name)
+#                     drugs.append(drug)
+
+#                 category_names = data.pop('category', []) if request.data else []
+#                 categories = []
+#                 for category_name in category_names:
+#                     category = Category.objects.get(name=category_name)
+#                     categories.append(category)
+
+#                 # Process image files
+#                 images = []
+#                 for image_file in data.pop('image_files', []):
+#                     with open(image_file, 'rb') as f:
+#                         file_data = f.read()
+#                     image = SimpleUploadedFile(image_file, file_data)
+#                     images.append(image)
+
+#                 # Create serializer and save medicine with drugs, categories, and images
+#                 serializer = MedicineCreateSerializer(data=data)
+#                 serializer.is_valid(raise_exception=True)
+#                 medicine = serializer.save(drug=drugs, category=categories)
+#                 for image in images:
+#                     medicine.medicineimage_set.create(image=image)
+#                 success_list.append(medicine)
+#             except ValidationError as e:
+#                 fail_list.append((data, str(e)))
+
+#         response_data = {
+#             'success': MedicineSerializer(success_list, many=True).data,
+#             'fail': fail_list,
+#             'success_count': len(success_list),
+#             'fail_count': len(fail_list),
+#         }
+#         return Response(response_data)
+    
+#     @action(detail=False, methods=['PATCH'])
+#     def bulk_patch(self, request):
+#         success_list = []
+#         fail_list = []
+#         for data in request.data:
+#             medicine = self.get_object().filter(id=data.pop('id')).first()
+#             if not medicine:
+#                 fail_list.append({'id': data['id'], 'error': 'Medicine does not exist'})
+#                 continue  # Skip if the medicine does not exist
+#             serializer = self.get_serializer(medicine, data=data, partial=True)
+#             try:
+#                 serializer.is_valid(raise_exception=True)
+#                 success_list.append(serializer.save())
+#             except serializers.ValidationError as e:
+#                 fail_list.append({'id': data['id'], 'error': str(e)})
+#         return Response({
+#             'updated': len(success_list),
+#             'failed': len(fail_list),
+#             'fail_list': fail_list,
+#         })
+
+#     @action(detail=False, methods=['DELETE'])
+#     def bulk_delete(self, request):
+#         medicine_ids = request.data.get('ids', [])  # Get the list of medicine ids to delete
+#         deleted_medicines = []
+#         failed_medicines = []
+#         for medicine_id in medicine_ids:
+#             try:
+#                 medicine = Medicine.objects.get(id=medicine_id)
+#                 medicine.delete()
+#                 deleted_medicines.append(medicine_id)
+#             except Medicine.DoesNotExist:
+#                 failed_medicines.append({'id': medicine_id, 'error': 'Medicine not found'})
+#             except ProtectedError:
+#                 failed_medicines.append({'id': medicine_id, 'error': 'Medicine is related to other models'})
+#         response_data = {'deleted': deleted_medicines,'deleted_count' : len(deleted_medicines), 'failed': failed_medicines,'failed_count': len(failed_medicines) }
+#         return Response(response_data)
 
 
 class DrugViewSet(ModelViewSet):

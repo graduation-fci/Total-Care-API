@@ -26,8 +26,8 @@ class Category(models.Model):
 class Medicine(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name="medicine name")
     name_ar = models.CharField(max_length=255, unique=True, verbose_name="medicine name_ar")
-    category = models.ManyToManyField(Category, related_name='medicines')
-    drug = models.ManyToManyField(Drug, related_name='medicines')
+    category = models.ManyToManyField(Category, related_name='medicines',blank=True)
+    drug = models.ManyToManyField(Drug, related_name='medicines',blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     company = models.CharField(null=True, max_length=255, verbose_name="medicine company")
     parcode = models.BigIntegerField(null=True)
