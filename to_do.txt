@@ -3,7 +3,7 @@
 - mock many to many medicine categories * //done
 - provide images to categories and products (statick-image-for-now) * //done
 - move (core) users end-points to their seperate app * //done
-- modify bulk ceate after each of the above * 
+- modify bulk ceate after each of the above * //done
 
 - provide single view for medication profile
 - fix patch and delete for medication profiles

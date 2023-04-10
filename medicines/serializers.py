@@ -94,9 +94,43 @@ class CategorySerializer(serializers.ModelSerializer):
 #dont post single item outside bulk create
 #response with drugs equal to null
 class MedicineSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','price','drug','company','parcode']
+        fields = ['id', 'name','name_ar','category','price','drug','company','parcode','medicine_images']
         drug = DrugSerializer(many=True,source='drug.medicines')
+        medicine_images = ImageSerializer(many = True,source='image.medicine_images')
         depth = 1
         
+class MedicineCreateSerializer(MedicineSerializer):
+    def create(self, validated_data):
+        image_files = validated_data.pop('image_files', None)
+        med = super().create(validated_data)
+        med_imgs = []
+        if image_files:
+            for image_file in image_files:
+                _image = self._upload_image(image_file)
+                med_imgs.append(_image)
+            med.medicine_images = med_imgs
+            med.save()
+        return med
+
+    def update(self, instance, validated_data):
+        image_files = validated_data.pop('image_files', None)
+        med = super().update(instance, validated_data)
+        med_imgs = []
+        if image_files:
+            for image_file in image_files:
+                _image = self._upload_image(image_file)
+                med_imgs.append(_image)
+            med.medicine_images = med_imgs
+            med.save()
+
+    def _upload_image(self, image_file):
+        try:
+            with open(image_file, 'rb') as f:
+                image_name = os.path.basename(image_file)
+                image_content = f.read()
+                return Image.objects.create(image=ContentFile(image_content, name=image_name))
+        except FileNotFoundError:
+            raise serializers.ValidationError('Image file not found')

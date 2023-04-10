@@ -33,32 +33,44 @@ from django.core.files import File
 
 class MedicineViewSet(ModelViewSet):
     queryset = Medicine.objects.prefetch_related('drug').all()
-    serializer_class = MedicineSerializer
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = MedicineFilter
     search_fields = ['name']
     ordering_fields = ['name', 'price']
 
+    def get_serializer_class(self):
+        if self.request.method == 'POST'or self.request.method == 'PATCH' :
+            return MedicineCreateSerializer
+        return MedicineSerializer
+
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
-        drug_names = request.data[0].pop('drug', []) if request.data else []  # Remove drug names from request data
-        drugs = []
-        for drug_name in drug_names:
-            try:
-                drug = Drug.objects.get(name=drug_name)
-            except Drug.DoesNotExist:
-                drug = Drug.objects.create(name=drug_name)
-            drugs.append(drug)
+        
 
         success_list = []
         fail_list = []
 
         for data in request.data:
             try:
+                drug_names = data.pop('drug', []) if request.data else []  # Remove drug names from request data
+                drugs = []
+                for drug_name in drug_names:
+                    try:
+                        drug = Drug.objects.get(name=drug_name)
+                    except Drug.DoesNotExist:
+                        drug = Drug.objects.create(name=drug_name)
+                    drugs.append(drug)
+                
+                category_names = data.pop('category', []) if request.data else []  # Remove category names from request data
+                categories = []
+                for category_name in category_names:
+                    category = Category.objects.get(name=category_name)
+                    categories.append(category)
+
                 serializer = MedicineSerializer(data=data)
                 serializer.is_valid(raise_exception=True)
-                medicine = serializer.save(drug=drugs)
+                medicine = serializer.save(drug=drugs,category=categories)
                 success_list.append(medicine)
             except ValidationError as e:
                 fail_list.append((data, str(e)))
