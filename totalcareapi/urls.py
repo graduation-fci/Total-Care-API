@@ -46,6 +46,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('medicine/', include('medicines.urls')),
     path('core/', include('core.urls')),
+    path('users/', include('users.urls')),
     path('auth/', include('djoser.urls')),
     # path('auth/', include('djoser.urls.jwt')),  //overided abd added more payload info in core app
     path('auth/', include('core.urls')),

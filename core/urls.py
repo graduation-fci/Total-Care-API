@@ -12,9 +12,7 @@ custompatterns= [
     re_path(r"^jwt/create/?", CustomTokenObtainPairView.as_view(), name="jwt-create"),   
 ]
 
-router = routers.DefaultRouter()
-router.register('patients', views.PatientViewSet)
-router.register('medications', views.MedicationProfileViewSet,basename="medications")
 
 
-urlpatterns = custompatterns + djoserpatterns + router.urls
+
+urlpatterns = custompatterns + djoserpatterns

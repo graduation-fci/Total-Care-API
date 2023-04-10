@@ -43,10 +43,7 @@ class Patient(Person):
     bloodType = models.CharField(max_length=255)
 
 
-class MedicationProfile (models.Model):
-    medicine = models.ManyToManyField(Medicine, related_name='medicines')
-    patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='profiles')
+
 
 
 class Doctor(Person):

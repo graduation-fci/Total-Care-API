@@ -8,6 +8,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register('products', views.MedicineViewSet)
 router.register('drugs', views.DrugViewSet)
+router.register('categories', views.CategoryViewSet)
 router.register('interactions', views.InteractionsViewSet, basename='interactions')
 
 # urlpatterns = [

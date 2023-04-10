@@ -1,8 +1,8 @@
 - handle bulk create functions handle exception * //done
 - patch and delete operations * //done
-- mock many to many medicine categories *
-- provide images to categories and products (statick-image-for-now) *
-- move (core) users end-points to their seperate app *
+- mock many to many medicine categories * //done
+- provide images to categories and products (statick-image-for-now) * //done
+- move (core) users end-points to their seperate app * //done
 - modify bulk ceate after each of the above * 
 
 - provide single view for medication profile

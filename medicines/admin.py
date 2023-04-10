@@ -16,6 +16,13 @@ class DrugAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_filter = ['name']
 
+@admin.register(models.Category)
+class DrugAdmin(admin.ModelAdmin):
+    list_display = ['id','name']
+    ordering = ['name']
+    search_fields = ['name']
+    list_filter = ['name']
+
 @admin.register(models.Medicine)
 class MedicineAdmin(admin.ModelAdmin):
     list_display = ['__str__' , 'drugs_number','id']
