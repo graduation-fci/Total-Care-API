@@ -5,6 +5,7 @@
 - move (core) users end-points to their seperate app * //done
 - modify bulk ceate after each of the above * //done
 
+- manage deletion of medicine images
 - provide single view for medication profile
 - fix patch and delete for medication profiles
 - save report of checked_interaction if profile_id is provided (modify interactions view accordingly)
