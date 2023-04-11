@@ -181,7 +181,7 @@ class DrugViewSet(ModelViewSet):
         for data in request.data:
             drug = Drug.objects.filter(id=data.pop('id')).first()
             if not drug:
-                fail_list.append({'id': data['id'], 'error': 'Drug does not exist'})
+                fail_list.append({'id': data['name'], 'error': 'Drug does not exist'})
                 continue  # Skip if the drug does not exist
             serializer = self.get_serializer(drug, data=data, partial=True)
             try:
@@ -248,7 +248,7 @@ class CategoryViewSet(ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 success_list.append(serializer.save())
             except serializers.ValidationError as e:
-                fail_list.append({'id': data['id'], 'error': str(e)})
+                fail_list.append({'id': data['name'], 'error': str(e)})
         return Response({
             'updated': len(success_list),
             'failed': len(fail_list),
