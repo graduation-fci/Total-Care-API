@@ -179,7 +179,7 @@ class DrugViewSet(ModelViewSet):
         success_list = []
         fail_list = []
         for data in request.data:
-            drug = self.get_object().filter(id=data.pop('id')).first()
+            drug = Drug.objects.filter(id=data.pop('id')).first()
             if not drug:
                 fail_list.append({'id': data['id'], 'error': 'Drug does not exist'})
                 continue  # Skip if the drug does not exist
@@ -239,7 +239,7 @@ class CategoryViewSet(ModelViewSet):
         success_list = []
         fail_list = []
         for data in request.data:
-            category = self.get_object().filter(id=data.pop('id')).first()
+            category = Category.objects.filter(id=data.pop('id')).first()
             if not category:
                 fail_list.append({'id': data['id'], 'error': 'Category does not exist'})
                 continue  # Skip if the category does not exist
