@@ -13,14 +13,15 @@ import random
 from itertools import chain
 import json
 from medicines.models import Medicine
-from medicines.serializers import DrugSerializer, MedicineSerializer
+from medicines.serializers import DrugSerializer, ImageSerializer
 
 
 
 class SimpleMedicineSerializer(serializers.ModelSerializer):
+    medicine_images = ImageSerializer(many = True)
     class Meta:
         model = Medicine
-        fields = ['id','name', 'name_ar', 'drug']
+        fields = ['id','name', 'name_ar', 'drug','medicine_images']
         drug = DrugSerializer(many=True, read_only=True,
                               source='drug.medicines')
         depth = 1

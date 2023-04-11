@@ -29,7 +29,17 @@ from django.db.models.deletion import ProtectedError
 from rest_framework.parsers import MultiPartParser, JSONParser
 from google.protobuf.json_format import MessageToDict
 from django.core.files import File
+from users.serializers import SimpleMedicineSerializer
 
+
+class SimpleMedicineViewSet(ModelViewSet):
+    queryset = Medicine.objects.prefetch_related('drug').all()
+    pagination_class = DefaultPagination
+    serializer_class = SimpleMedicineSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = MedicineFilter
+    search_fields = ['name']
+    ordering_fields = ['name', 'price']
 
 
 class MedicineViewSet(ModelViewSet):
@@ -122,7 +132,7 @@ class MedicineViewSet(ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 success_list.append(serializer.save(drug=drugs,category=categories))
             except serializers.ValidationError as e:
-                fail_list.append({'id': data['id'], 'error': str(e)})
+                fail_list.append({'name': data['name'], 'error': str(e)})
         return Response({
             'updated': len(success_list),
             'failed': len(fail_list),
@@ -181,14 +191,14 @@ class DrugViewSet(ModelViewSet):
         for data in request.data:
             drug = Drug.objects.filter(id=data.pop('id')).first()
             if not drug:
-                fail_list.append({'id': data['name'], 'error': 'Drug does not exist'})
+                fail_list.append({'name': data['name'], 'error': 'Drug does not exist'})
                 continue  # Skip if the drug does not exist
             serializer = self.get_serializer(drug, data=data, partial=True)
             try:
                 serializer.is_valid(raise_exception=True)
                 success_list.append(serializer.save())
             except serializers.ValidationError as e:
-                fail_list.append({'id': data['id'], 'error': str(e)})
+                fail_list.append({'name': data['name'], 'error': str(e)})
         return Response({
             'updated': len(success_list),
             'failed': len(fail_list),
@@ -241,14 +251,14 @@ class CategoryViewSet(ModelViewSet):
         for data in request.data:
             category = Category.objects.filter(id=data.pop('id')).first()
             if not category:
-                fail_list.append({'id': data['id'], 'error': 'Category does not exist'})
+                fail_list.append({'name': data['name'], 'error': 'Category does not exist'})
                 continue  # Skip if the category does not exist
             serializer = self.get_serializer(category, data=data, partial=True)
             try:
                 serializer.is_valid(raise_exception=True)
                 success_list.append(serializer.save())
             except serializers.ValidationError as e:
-                fail_list.append({'id': data['name'], 'error': str(e)})
+                fail_list.append({'name': data['name'], 'error': str(e)})
         return Response({
             'updated': len(success_list),
             'failed': len(fail_list),
