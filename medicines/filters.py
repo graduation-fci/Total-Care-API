@@ -5,6 +5,6 @@ class MedicineFilter(FilterSet):
   class Meta:
     model = Medicine
     fields = {
-      #'category': ['exact'],
+      'category': ['exact'],
       'price': ['gt', 'lt']
     }
