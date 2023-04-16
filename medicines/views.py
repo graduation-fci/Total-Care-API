@@ -16,7 +16,9 @@ import tempfile
 import base64
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from core.models import Patient
 from medicines.filters import MedicineFilter
+from users.models import MedicationProfile
 from .serializers import *
 from medicines.pagination import DefaultPagination
 from django.shortcuts import render
@@ -305,5 +307,16 @@ class InteractionsViewSet(ViewSet):
         response = stub.CheckInteractions(my_request)
         
         response_dict = MessageToDict(response)
+        
+        # print("id" , data['id'])
+        # if data['id'] != None:
+        #     user_id =self.request.user.id
+        #     patient = Patient.objects.get(user_id=user_id)
+        #     profile_ids = MedicationProfile.objects.filter(patient=patient).values_list('id', flat=True)
+
+        #     if data['id'] in profile_ids:
+        #         print("True")
+
+
         return Response(response_dict, status=status.HTTP_200_OK)
 

@@ -27,6 +27,7 @@ class DrugAdmin(admin.ModelAdmin):
 class MedicineAdmin(admin.ModelAdmin):
     list_display = ['__str__' , 'drugs_number','id']
     ordering = ['name']
+    search_fields = ['name']
     
     @admin.display(ordering='drugs_number')
     def drugs_number(self, medicine):
