@@ -76,18 +76,21 @@ class MedicineViewSet(ModelViewSet):
                 category_names = data.pop('category', []) if request.data else []  # Remove category names from request data
                 categories = []
                 
-                for category_name in category_names:
-                    category = Category.objects.get(name=category_name)
-                    categories.append(category)
-                print(category_names)
+                if len(category_names) > 0:
+                    for category_name in category_names:
+                        print(category_name)
+                        print(data['name'])
+                        category = Category.objects.get(name=category_name)
+                        categories.append(category)
+                
                 
 
                 serializer = MedicineCreateSerializer(data=data)
-                print(serializer)
+                
                 serializer.is_valid(raise_exception=True)
-                print("valid")
+                
                 medicine = serializer.save(drug=drugs,category=categories)
-                print("med")
+                
                 success_list.append(medicine)
             except ValidationError as e:
                 fail_list.append((data, str(e)))

@@ -13,8 +13,9 @@ import os
 import tempfile
 from django.core.files.base import ContentFile
 import base64
-from io import BytesIO
-
+import io
+import requests
+from django.core.files.images import ImageFile
 
 
 class DrugSerializer(serializers.ModelSerializer):
@@ -81,13 +82,23 @@ class CategorySerializer(serializers.ModelSerializer):
         return category
 
     def _upload_image(self, image_file):
-        try:
-            with open(image_file, 'rb') as f:
-                image_name = os.path.basename(image_file)
-                image_content = f.read()
-                return Image.objects.create(image=ContentFile(image_content, name=image_name))
-        except FileNotFoundError:
-            raise serializers.ValidationError('Image file not found')
+        if image_file.startswith('http'):
+            # Image file is a URL
+            response = requests.get(image_file)
+            response.raise_for_status()
+            image_content = response.content
+            image_name = os.path.basename(image_file)
+            in_memory_file = io.BytesIO(image_content)
+            return Image.objects.create(image=ImageFile(in_memory_file, name=image_name))
+        else:
+            # Image file is a file path
+            try:
+                with open(image_file, 'rb') as f:
+                    image_name = os.path.basename(image_file)
+                    image_content = f.read()
+                    return Image.objects.create(image=ContentFile(image_content, name=image_name))
+            except FileNotFoundError:
+                raise serializers.ValidationError('Image file not found')
 
 
 
@@ -139,12 +150,21 @@ class MedicineCreateSerializer(serializers.ModelSerializer):
             Image.objects.create(medicine=med, image=img)
     
     def _upload_image(self, image_file):
-        try:
-            with open(image_file, 'rb') as f:
-                image_name = os.path.basename(image_file)
-                image_content = f.read()
-                return ContentFile(image_content, name=image_name)
-        except FileNotFoundError as e:
-            raise serializers.ValidationError(f'Image file not found: {image_file}. Error: {e}')
+        if image_file.startswith('http'):
+            # Image file is a URL
+            response = requests.get(image_file)
+            response.raise_for_status()
+            image_content = response.content
+            image_name = os.path.basename(image_file)
+        else:
+            # Image file is a file path
+            try:
+                with open(image_file, 'rb') as f:
+                    image_name = os.path.basename(image_file)
+                    image_content = f.read()
+            except FileNotFoundError as e:
+                raise serializers.ValidationError(f'Image file not found: {image_file}. Error: {e}')
+
+        return ContentFile(image_content, name=image_name)
 
 
