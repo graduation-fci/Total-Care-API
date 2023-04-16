@@ -8,7 +8,7 @@
 - manage permissions
 - manage deletion of medicine images * //brainstorming but not mandatoy //admin
 - provide single view for medication profile *// half done
-- fix patch and delete for medication profiles *// needed 
+- fix patch and delete for medication profiles *// done
 
 - save report of checked_interaction if profile_id is provided (modify interactions view accordingly) *//
 - update the report by rechecking interactions every time a new medicine is added to medication profile *//

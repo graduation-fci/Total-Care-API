@@ -18,7 +18,14 @@ from medicines.serializers import DrugSerializer, ImageSerializer
 
 
 class SimpleMedicineSerializer(serializers.ModelSerializer):
-    medicine_images = ImageSerializer(many = True)
+    medicine_images = serializers.SerializerMethodField()
+
+    def get_medicine_images(self, obj):
+        request = self.context.get('request')
+        images = obj.medicine_images.all()
+        if images:
+            return [request.build_absolute_uri(image.image.url) for image in images]
+        return []
     class Meta:
         model = Medicine
         fields = ['id','name', 'name_ar', 'drug','medicine_images']
@@ -32,7 +39,7 @@ class MedicationProfileGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MedicationProfile
-        fields = ['id','medicine']
+        fields = ['id','title','medicine']
         depth = 1
 
 
@@ -65,7 +72,7 @@ class MedicationProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MedicationProfile
-        fields = ['id', 'medicines']
+        fields = ['id', 'title','medicines']
         depth = 1
 
 

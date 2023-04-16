@@ -58,13 +58,16 @@ class MedicationProfileViewSet(ModelViewSet):
         return MedicationProfileSerializer
 
     def get_serializer_context(self):
-         return {'user_id': self.request.user.id}
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        context['user_id']= self.request.user.id
+        return context
 
     def get_queryset(self):
         user = self.request.user
         if user.is_staff:
-            return MedicationProfile.objects.all()
+            return MedicationProfile.objects.prefetch_related('medicine').all().order_by('title')
         
         patient_id = Patient.objects.only('id').get(user_id=user.id)
 
-        return MedicationProfile.objects.filter(patient_id = patient_id)
+        return MedicationProfile.objects.prefetch_related('medicine').filter(patient_id = patient_id).order_by('title')
