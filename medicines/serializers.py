@@ -114,6 +114,22 @@ class MedicineSerializer(serializers.ModelSerializer):
         drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
 
+
+#created for updating or removing specific images from medicine
+class MedicinePatchSerializer(serializers.ModelSerializer):
+    medicine_images = serializers.PrimaryKeyRelatedField(
+        queryset=Image.objects.all(),
+        many=True,
+        required=False
+    )
+    category = CategoryGetSerializer(many = True)
+    class Meta:
+        model = Medicine
+        fields = ['id', 'name','name_ar','category','price','drug','company','parcode','medicine_images']
+        drug = DrugSerializer(many=True,source='drug.medicines')
+        depth = 1
+
+
 class MedicineCreateSerializer(serializers.ModelSerializer):
     image_files = serializers.ListField(child = serializers.CharField(),write_only=True, required=False)
 

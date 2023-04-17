@@ -53,7 +53,10 @@ class MedicineViewSet(ModelViewSet):
     ordering_fields = ['name', 'price']
 
     def get_serializer_class(self):
-        if self.request.method == 'POST' or self.request.method == 'PATCH' :
+
+        if self.request.method == 'PATCH' and 'products' in self.request.path:
+            return MedicinePatchSerializer
+        elif self.request.method == 'POST' or self.request.method == 'PATCH' :
             return MedicineCreateSerializer
         return MedicineSerializer
 
