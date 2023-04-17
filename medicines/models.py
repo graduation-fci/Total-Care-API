@@ -29,6 +29,7 @@ class Medicine(models.Model):
     category = models.ManyToManyField(Category, related_name='medicines',blank=True)
     drug = models.ManyToManyField(Drug, related_name='medicines',blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    inventory = models.IntegerField(validators=[MinValueValidator(0)])
     company = models.CharField(null=True, max_length=255, verbose_name="medicine company")
     parcode = models.BigIntegerField(null=True)
 

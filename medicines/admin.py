@@ -25,7 +25,7 @@ class DrugAdmin(admin.ModelAdmin):
 
 @admin.register(models.Medicine)
 class MedicineAdmin(admin.ModelAdmin):
-    list_display = ['__str__' , 'drugs_number','id']
+    list_display = ['__str__' , 'id','inventory','drugs_number']
     ordering = ['name']
     search_fields = ['name']
     
