@@ -17,3 +17,5 @@ users/migrations/
 
 media/
 media.rar
+store/__pycache__/
+store/migrations/
