@@ -75,16 +75,24 @@ class MedicationProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'title','medicines']
         depth = 1
 
+class AddressSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        user_id = self.context['user_id']
+        patient = Patient.objects.only('id').get(user_id=user_id)
+        return Address.objects.create(customer_id=patient.id, **validated_data)
 
+    class Meta:
+        model = Address
+        fields = ['id', 'street', 'city', 'description']
 
 class PatientSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
     profiles = MedicationProfileSerializer(many=True, read_only=True)
+    adresses = AddressSerializer(many=True)
 
     class Meta:
         model = Patient
-        fields = ['id', 'user_id', 'phone',
-                  'birth_date', 'profiles', 'bloodType']
+        fields = ['id', 'user_id', 'phone','adresses', 'birth_date', 'profiles', 'bloodType']
         # MedicationProfile = MedicationProfileSerializer(many=True, read_only=True, source='drug.medicines')
         depth = 1
 

@@ -19,6 +19,23 @@ from core.models import *
 
 # Create your views here.
 
+class AddressViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Address.objects.all()
+        patient_id = Patient.objects.only('id').get(user_id=user.id)
+        return Address.objects.filter(customer_id = patient_id)
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        context['user_id']= self.request.user.id
+        return context
+    
 
 class PatientViewSet(ModelViewSet):
     queryset = Patient.objects.all()
