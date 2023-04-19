@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'guardian',
     'core',
     'users',
+    'store',
     'django_extensions',
     'drf_yasg',
 
