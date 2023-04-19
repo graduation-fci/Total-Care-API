@@ -66,7 +66,10 @@ class MedicationProfileSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         # Update the fields on the instance object
-        instance.medicine.set(validated_data.get('medicines', []))
+        if 'title' in validated_data:
+            instance.title = validated_data.get('title', instance.title)
+        if 'medicines' in validated_data:
+            instance.medicine.set(validated_data['medicines'])
         instance.save()
         return instance
     
