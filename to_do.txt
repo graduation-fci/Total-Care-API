@@ -6,12 +6,11 @@
 - modify bulk ceate after each of the above * //done
 - provide single view for medication profile *// done
 - fix patch and delete for medication profiles *// done
-
+- shopping cart and ordering services *// done
 
 
 - manage permissions
 
-- shopping cart and ordering services //ordainary
 
 - provide admin views for users, orders //ordainary
 
