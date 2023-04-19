@@ -4,9 +4,8 @@
 - provide images to categories and products (statick-image-for-now) * //done
 - move (core) users end-points to their seperate app * //done
 - modify bulk ceate after each of the above * //done
-- provide single view for medication profile // done
-- fix patch and delete for medication profiles// done
-- manage deletion of medicine images * //done
+- provide single view for medication profile *// done
+- fix patch and delete for medication profiles *// done
 
 
 
@@ -18,7 +17,3 @@
 
 - think how to handle or mock payments and reports depends onboth above
 
-
-//delay
-- save report of checked_interaction if profile_id is provided (modify interactions view accordingly) //
-- update the report by rechecking interactions every time a new medicine is added to medication profile//
