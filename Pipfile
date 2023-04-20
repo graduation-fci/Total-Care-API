@@ -28,6 +28,7 @@ drf-yasg = "*"
 grpcio = "*"
 protobuf = "*"
 grpcio-tools = "*"
+django-allauth = "*"
 
 [dev-packages]
 

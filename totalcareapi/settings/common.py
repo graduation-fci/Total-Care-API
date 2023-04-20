@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'core',
     'users',
     'store',
+    'allauth',
     'django_extensions',
     'drf_yasg',
 
@@ -173,6 +174,7 @@ DJOSER = {
     'SEND_CONFIRMATION_EMAIL': False,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8001'],
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
         'user': 'core.serializers.UserCreateSerializer',
@@ -182,12 +184,45 @@ DJOSER = {
         'password_reset': 'djoser.email.PasswordResetEmail',
         'password_changed_confirmation': 'djoser.email.PasswordChangedConfirmationEmail',
     }
+
 }
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1)
 }
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '232446623243-gpvu6hb51b70cdjvmnnqebrp2h2ll6nb.apps.googleusercontent.com',
+            'secret': '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',
+            'key': '',
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    },
+    'facebook': {
+        'APP': {
+            'client_id': '925636451913961',
+            'secret': 'a3efe8c232c718223674a3263682a829',
+            'key': '',
+        },
+        'SCOPE': [
+            'email',
+            'public_profile',
+        ],
+        'AUTH_PARAMS': {
+            'auth_type': 'reauthenticate',
+        }
+    }
+}
+
 
 DJANGO_TEMPLATED_MAIL = {
     'DOMAIN': 'example.com',
