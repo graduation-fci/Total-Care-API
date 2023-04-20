@@ -8,8 +8,6 @@ from rest_framework import serializers
 from medicines.models import Medicine
 
 
-
-
 class StoreMedicineSerializer(serializers.ModelSerializer):
     medicine_images = serializers.SerializerMethodField()
 
@@ -21,14 +19,15 @@ class StoreMedicineSerializer(serializers.ModelSerializer):
             return [request.build_absolute_uri(image.image.url) for image in images]
         return []
 
-    
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','price','medicine_images']
+        fields = ['id', 'name', 'name_ar', 'price', 'medicine_images']
         depth = 1
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = StoreMedicineSerializer()
+
     class Meta:
         model = OrderItem
         fields = ['id', 'product', 'unit_price', 'quantity']
@@ -39,7 +38,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'placed_at', 'payment_status', 'items', 'total_price']
+        fields = ['id', 'customer', 'placed_at',
+                  'payment_status', 'items', 'total_price']
 
 
 class UpdateOrderSerializer(serializers.ModelSerializer):
@@ -54,44 +54,66 @@ class CreateOrderSerializer(serializers.Serializer):
 
     def validate_cart_id(self, cart_id):
         if not Cart.objects.filter(pk=cart_id).exists():
-            raise serializers.ValidationError('No cart with the given ID was found.')
+            raise serializers.ValidationError(
+                'No cart with the given ID was found.')
         if CartItem.objects.filter(cart_id=cart_id).count() == 0:
             raise serializers.ValidationError('The cart is empty.')
         return cart_id
-    
+
     def validate_address_id(self, address_id):
         customer = Patient.objects.get(user_id=self.context['user_id'])
         if not Address.objects.filter(pk=address_id).exists():
-            raise serializers.ValidationError('No address with the given ID was found.')
+            raise serializers.ValidationError(
+                'No address with the given ID was found.')
         if not Address.objects.filter(customer=customer, id=address_id).exists():
             raise serializers.ValidationError('Not Allowed Address!!!')
         return address_id
-    
-    
+
     def save(self, **kwargs):
         with transaction.atomic():
             cart_id = self.validated_data['cart_id']
             customer = Patient.objects.get(user_id=self.context['user_id'])
             address_id = self.validated_data['address_id']
             order_address = Address.objects.get(id=address_id)
-            
-            cart_items = CartItem.objects.select_related('product').filter(cart_id=cart_id)
-            cart_total_price = sum([item.quantity * item.product.price for item in cart_items])
+
+            cart_items = CartItem.objects.select_related(
+                'product').filter(cart_id=cart_id)
+            cart_total_price = sum(
+                [item.quantity * item.product.price for item in cart_items])
             charge = 150
             order_total_price = cart_total_price + charge
-            
-            order = Order.objects.create(customer=customer, address=order_address, total_price=order_total_price)
 
-            order_items = [
-                OrderItem(
-                    order=order,
-                    product=item.product,
-                    unit_price=item.product.price,
-                    quantity=item.quantity
-                ) for item in cart_items
-            ]
+            order = Order.objects.create(
+                customer=customer, address=order_address, total_price=order_total_price)
+
+            # order_items = [
+            #     OrderItem(
+            #         order=order,
+            #         product=item.product,
+            #         unit_price=item.product.price,
+            #         quantity=item.quantity
+            #     ) for item in cart_items
+            # ]
+
+            order_items = []
+            for item in cart_items:
+                product = item.product
+                quantity = item.quantity
+                if product.inventory - quantity >= 0:
+                    order_items.append(OrderItem(
+                        order=order,
+                        product=product,
+                        unit_price=item.product.price,
+                        quantity=quantity
+                    ))
+                    product.inventory -= quantity
+                    product.save()
+                else:
+                    raise serializers.ValidationError(
+                        f'{product.name} inventory not suficient.')
+
             OrderItem.objects.bulk_create(order_items)
-            cart_items.delete() 
+            cart_items.delete()
             return order
 
 
@@ -125,7 +147,8 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 
     def validate_product_id(self, value):
         if not Medicine.objects.filter(pk=value).exists():
-            raise serializers.ValidationError('No product with the given ID was found.')
+            raise serializers.ValidationError(
+                'No product with the given ID was found.')
         return value
 
     def save(self, **kwargs):
@@ -154,5 +177,3 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ['quantity']
-    
-
