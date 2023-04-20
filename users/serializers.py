@@ -91,11 +91,11 @@ class AddressSerializer(serializers.ModelSerializer):
 class PatientSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
     profiles = MedicationProfileSerializer(many=True, read_only=True)
-    adresses = AddressSerializer(many=True)
+    # adresses = AddressSerializer(many=True)
 
     class Meta:
         model = Patient
-        fields = ['id', 'user_id', 'phone','adresses', 'birth_date', 'profiles', 'bloodType']
+        fields = ['id', 'user_id', 'phone', 'birth_date', 'profiles', 'bloodType']
         # MedicationProfile = MedicationProfileSerializer(many=True, read_only=True, source='drug.medicines')
         depth = 1
 
