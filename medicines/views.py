@@ -284,7 +284,7 @@ class CategoryViewSet(ModelViewSet):
 
 
     
-channel = grpc.insecure_channel('localhost:50051')
+
 
 class InteractionsViewSet(ViewSet):
     def create(self, request):
@@ -292,6 +292,8 @@ class InteractionsViewSet(ViewSet):
         medicines = data.get('medicine', [])
         
         #transformed_medicines = Operation.transform(medicines)
+
+        channel = grpc.insecure_channel('localhost:50051')
 
         my_request = graph_pb2.CheckInteractionsRequest()
         for medicine in medicines:
