@@ -14,3 +14,6 @@
 - provide admin views for users, orders //ordainary
 - think how to handle or mock payments and reports depends onboth above
 
+
+
+-if implement the report micro-service add uuid4 to the medication profile.
