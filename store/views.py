@@ -53,10 +53,10 @@ class OrderViewSet(ModelViewSet):
         user = self.request.user
 
         if user.is_staff:
-            return Order.objects.all()
+            return Order.objects.prefetch_related('address').all()
 
         customer_id = Patient.objects.only('id').get(user_id=user.id)
-        return Order.objects.filter(customer_id=customer_id)
+        return Order.objects.prefetch_related('address').filter(customer_id=customer_id)
 
 class CartViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']

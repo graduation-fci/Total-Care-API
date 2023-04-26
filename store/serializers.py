@@ -1,5 +1,6 @@
 from users.models import *
 from medicines.serializers import CategoryGetSerializer, DrugSerializer, ImageSerializer, MedicineSerializer
+from users.serializers import AddressSerializer
 from .models import *
 from re import S
 from django.db import transaction
@@ -35,17 +36,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    address = AddressSerializer()
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'placed_at',
-                  'payment_status', 'items', 'total_price']
+        fields = ['id', 'customer','address' ,'placed_at', 'order_status', 'payment_method' ,'items', 'total_price']
 
 
 class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['payment_status']
+        fields = ['order_status']
 
 
 class CreateOrderSerializer(serializers.Serializer):
@@ -110,7 +111,7 @@ class CreateOrderSerializer(serializers.Serializer):
                     product.save()
                 else:
                     raise serializers.ValidationError(
-                        f'{product.name} inventory not suficient.')
+                        f'{product.name} inventory not suficient, only {product.inventory - 1} availabel')
 
             OrderItem.objects.bulk_create(order_items)
             cart_items.delete()

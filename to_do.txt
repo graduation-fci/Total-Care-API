@@ -7,11 +7,13 @@
 - provide single view for medication profile *// done
 - fix patch and delete for medication profiles *// done
 - shopping cart and ordering services *// done
-
+- check medicine inventory when adding to shopping cart //not neccessary
 
 - manage permissions
-- check medicine inventory when adding to shopping cart 
+
+
 - provide admin views for users, orders //ordainary
+
 - think how to handle or mock payments and reports depends onboth above
 
 

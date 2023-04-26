@@ -11,17 +11,31 @@ from users.models import Address
 
 
 class Order(models.Model):
-    PAYMENT_STATUS_PENDING = 'P'
-    PAYMENT_STATUS_COMPLETE = 'C'
-    PAYMENT_STATUS_FAILED = 'F'
-    PAYMENT_STATUS_CHOICES = [
-        (PAYMENT_STATUS_PENDING, 'Pending'),
-        (PAYMENT_STATUS_COMPLETE, 'Complete'),
-        (PAYMENT_STATUS_FAILED, 'Failed')
+    PAYMENT_METHOD_CASH = 'COD'
+    PAYMENT_METHOD_VISA = 'VIS'
+    PAYMENT_METHOD_CREDIT = 'CRD'
+    PAYMENT_METHOD_CHOICES = [
+        (PAYMENT_METHOD_CASH, 'cash on delivery'),
+        (PAYMENT_METHOD_VISA, 'visa'),
+        (PAYMENT_METHOD_CREDIT, 'site credit')
     ]
+    
+    ORDER_STATUS_PENDING = 'PEN'
+    ORDER_STATUS_CONFIRMED = 'CON'
+    ORDER_STATUS_COMPLETE = 'COM'
+    ORDER_STATUS_CANCELED = 'CAN'
+    ORDER_STATUS_CHOICES = [
+        (ORDER_STATUS_PENDING, 'Pending'),
+        (ORDER_STATUS_CONFIRMED, 'Confirmed'),
+        (ORDER_STATUS_COMPLETE, 'Complete'),
+        (ORDER_STATUS_CANCELED, 'Canceled')
+    ]
+    
+    
 
     placed_at = models.DateTimeField(auto_now_add=True)
-    payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING)
+    payment_method = models.CharField(max_length=3, choices=PAYMENT_METHOD_CHOICES, default=PAYMENT_METHOD_CASH)
+    order_status = models.CharField(max_length=3, choices=ORDER_STATUS_CHOICES, default=ORDER_STATUS_PENDING)
     customer = models.ForeignKey(Patient, on_delete=models.PROTECT, related_name='orders')
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     address = models.ForeignKey(Address, on_delete=models.PROTECT, related_name='order')
