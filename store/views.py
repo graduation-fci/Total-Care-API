@@ -12,6 +12,10 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthentic
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+
+from store.filters import OrderFilter
+
+
 from .serializers import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import *
@@ -22,7 +26,11 @@ from rest_framework.viewsets import GenericViewSet
     
 class OrderViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
-
+    
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = OrderFilter
+    
+    ordering_fields = ['placed_at']
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
