@@ -8,11 +8,14 @@
 - fix patch and delete for medication profiles *// done
 - shopping cart and ordering services *// done
 - check medicine inventory when adding to shopping cart //not neccessary
+- provide admin views for  orders //ordainary //done
+
+- provide admin views for users //done //messing filters
 
 - manage permissions
 
 
-- provide admin views for users, orders //ordainary
+
 
 - think how to handle or mock payments and reports depends onboth above
 
