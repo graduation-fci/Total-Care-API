@@ -36,13 +36,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
-        fields = ['id', 'username', 'password',
-                  'email', 'first_name', 'last_name', 'profile_type']
+        fields = ['id', 'username', 'password', 'email',
+                  'first_name', 'last_name', 'profile_type']
 
 
 class UserSerializerDAB(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
-        fields = ['id', 'username', 'email',
-                  'first_name', 'last_name', 'profile_type']
-
-
+        fields = ['id', 'username', 'email', 'first_name',
+                  'last_name', 'profile_type', 'is_staff', 'is_superuser']
+        read_only_fields = ['profile_type']

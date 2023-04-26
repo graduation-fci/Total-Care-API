@@ -175,7 +175,7 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
-        'user': 'core.serializers.UserCreateSerializer',
+        'user': 'core.serializers.UserSerializerDAB',
         'current_user': 'core.serializers.UserSerializerDAB',
     },
     'EMAIL' : {
