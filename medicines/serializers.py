@@ -157,7 +157,7 @@ class MedicineCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','price','drug','company','parcode','image_files']
+        fields = ['id', 'name','name_ar','category','price','drug','company','inventory','parcode','image_files']
         drug = DrugSerializer(many=True,source='drug.medicines')
 
     def create(self, validated_data):
@@ -181,7 +181,7 @@ class MedicineCreateSerializer(serializers.ModelSerializer):
     def create_images(self, med, image_files):
         print("Creating images...")
         med_imgs = []
-        if isinstance(image_files[0], int):
+        if str(image_files[0]).isdigit():
         # Image file is a list of ids
             for image_id in image_files:
                 try:
@@ -193,8 +193,8 @@ class MedicineCreateSerializer(serializers.ModelSerializer):
             for image_file in image_files:
                 _image = self._upload_image(image_file)
                 med_imgs.append(_image)
-                
-        if isinstance(image_files[0], int):
+        print(med_imgs)      
+        if str(image_files[0]).isdigit():
             for img in med_imgs:
                 img.medicine = med
                 img.save()
