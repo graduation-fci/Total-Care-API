@@ -48,6 +48,22 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['order_status']
 
+    def validate_order_status(self, value):
+        user = self.context['request'].user
+
+        # If user is staff, allow any update
+        if user.is_staff:
+            return value
+
+        # If order status is not confirmed, allow cancellation
+        if self.instance.order_status != Order.ORDER_STATUS_CONFIRMED:
+            if value == Order.ORDER_STATUS_CANCELED:
+                return value
+            else:
+                raise serializers.ValidationError("Invalid order status for non-staff user")
+        else:
+            raise serializers.ValidationError("Cannot update order status for confirmed orders")
+
 
 class CreateOrderSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
