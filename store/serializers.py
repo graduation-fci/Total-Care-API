@@ -43,26 +43,77 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'customer','address' ,'placed_at', 'order_status', 'payment_method' ,'items', 'total_price']
 
 
+# class UpdateOrderSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Order
+#         fields = ['order_status','adress']
+
+#     def validate_order_status(self, value):
+#         user = self.context['request'].user
+
+#         # If user is staff, allow any update
+#         if user.is_staff:
+#             return value
+
+#         # If order status is not confirmed, allow cancellation
+#         if self.instance.order_status != Order.ORDER_STATUS_CONFIRMED:
+#             if value == Order.ORDER_STATUS_CANCELED:
+#                 return value
+#             else:
+#                 raise serializers.ValidationError("Invalid order status for non-staff user")
+#         else:
+#             raise serializers.ValidationError("Cannot update order status for confirmed orders")
+
 class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['order_status']
+        fields = ['order_status', 'address']
 
     def validate_order_status(self, value):
         user = self.context['request'].user
+        order = self.instance
 
         # If user is staff, allow any update
         if user.is_staff:
             return value
 
-        # If order status is not confirmed, allow cancellation
-        if self.instance.order_status != Order.ORDER_STATUS_CONFIRMED:
+        # If order status is confirmed, disallow any update
+        if order.order_status == Order.ORDER_STATUS_CONFIRMED:
+            raise serializers.ValidationError("Cannot update confirmed orders")
+
+        # If order status is pending, allow cancellation
+        if order.order_status == Order.ORDER_STATUS_PENDING:
             if value == Order.ORDER_STATUS_CANCELED:
                 return value
             else:
                 raise serializers.ValidationError("Invalid order status for non-staff user")
-        else:
-            raise serializers.ValidationError("Cannot update order status for confirmed orders")
+
+        # For other order statuses, disallow status update and address update
+        if value != order.order_status:
+            raise serializers.ValidationError("Cannot update order status for non-pending orders")
+        if 'address' in self.initial_data:
+            raise serializers.ValidationError("Cannot update address for non-pending orders")
+
+        return value
+
+    def validate_address(self, value):
+        user = self.context['request'].user
+        order = self.instance
+
+        # If user is staff, allow any update
+        if user.is_staff:
+            return value
+
+        # If order status is confirmed, disallow any update
+        if order.order_status == Order.ORDER_STATUS_CONFIRMED:
+            raise serializers.ValidationError("Cannot update confirmed orders")
+
+        # If order status is pending, allow address update
+        if order.order_status == Order.ORDER_STATUS_PENDING:
+            return value
+
+        # For other order statuses, disallow address update
+        raise serializers.ValidationError("Cannot update address for non-pending orders")
 
 
 class CreateOrderSerializer(serializers.Serializer):
