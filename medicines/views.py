@@ -1,37 +1,20 @@
-
-from django.db.models.aggregates import Count
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import action, permission_classes, api_view
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, \
-    DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet , ViewSet
 from rest_framework import status
-from django.core.files.uploadedfile import SimpleUploadedFile
-import requests
-import tempfile
-import base64
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from core.models import Patient
 from medicines.filters import MedicineFilter
-from users.models import MedicationProfile
 from .serializers import *
 from medicines.pagination import DefaultPagination
-from django.shortcuts import render
 from medicines.graph_grpc import graph_pb2, graph_pb2_grpc
 import grpc
-from django.http import HttpResponse, JsonResponse
-import json
 from rest_framework.exceptions import ValidationError
 from django.db.models.deletion import ProtectedError
-from rest_framework.parsers import MultiPartParser, JSONParser
 from google.protobuf.json_format import MessageToDict
-from django.core.files import File
 from users.serializers import SimpleMedicineSerializer
+from .models import Image
+
 
 
 class SimpleMedicineViewSet(ModelViewSet):
@@ -325,3 +308,53 @@ class InteractionsViewSet(ViewSet):
 
         return Response(response_dict, status=status.HTTP_200_OK)
 
+
+
+class ImageViewSet(ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = UploadImageSerializer
+    pagination_class = DefaultPagination
+
+    @action(detail=False, methods=['POST'])
+    def bulk_create_images(self, request):
+        images = request.FILES.getlist('images')
+        success_ids = []
+        failed_items = []
+
+        for image in images:
+            serializer = self.get_serializer(data={'image': image})
+            if serializer.is_valid():
+                serializer.save()
+                success_ids.append(serializer.data['id'])
+            else:
+                failed_items.append({'item': image.name, 'cause': serializer.errors})
+        
+        response_data = {
+            'success_count': len(success_ids),
+            'success_ids': success_ids,
+            'fail_count': len(failed_items),
+            'failed_items': failed_items
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['DELETE'])
+    def bulk_delete_images(self, request):
+        image_ids = request.data.get('image_ids')
+        success_ids = []
+        failed_items = []
+
+        for image_id in image_ids:
+            try:
+                image = Image.objects.get(id=image_id)
+                image.delete()
+                success_ids.append(image_id)
+            except Image.DoesNotExist:
+                failed_items.append({'item': image_id, 'cause': 'Image not found'})
+        
+        response_data = {
+            'success_count': len(success_ids),
+            'success_ids': success_ids,
+            'fail_count': len(failed_items),
+            'failed_items': failed_items
+        }
+        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
