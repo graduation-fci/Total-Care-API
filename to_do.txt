@@ -13,7 +13,7 @@
 - provide admin views for users //done //messing filters
 
 - manage permissions
-
+- add phone number to adresses and vailidate phne numbers
 
 
 
