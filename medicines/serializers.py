@@ -100,7 +100,11 @@ class CategorySerializer(serializers.ModelSerializer):
         return category
 
     def _upload_image(self, image_file):
-        if image_file.startswith('http'):
+        if str(image_file).isdigit():
+            # Image file is an ID
+            image = Image.objects.get(id=image_file)
+            return image
+        elif image_file.startswith('http'):
             # Image file is a URL
             response = requests.get(image_file)
             response.raise_for_status()
@@ -177,11 +181,26 @@ class MedicineCreateSerializer(serializers.ModelSerializer):
     def create_images(self, med, image_files):
         print("Creating images...")
         med_imgs = []
-        for image_file in image_files:
-            _image = self._upload_image(image_file)
-            med_imgs.append(_image)
-        for img in med_imgs:
-            Image.objects.create(medicine=med, image=img)
+        if isinstance(image_files[0], int):
+        # Image file is a list of ids
+            for image_id in image_files:
+                try:
+                    image = Image.objects.get(id=image_id)
+                    med_imgs.append(image)
+                except Image.DoesNotExist:
+                    pass
+        else:
+            for image_file in image_files:
+                _image = self._upload_image(image_file)
+                med_imgs.append(_image)
+                
+        if isinstance(image_files[0], int):
+            for img in med_imgs:
+                img.medicine = med
+                img.save()
+        else:
+            for img in med_imgs:
+                Image.objects.create(medicine=med, image=img)
     
     def _upload_image(self, image_file):
         if image_file.startswith('http'):
