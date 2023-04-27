@@ -67,7 +67,7 @@ class OrderViewSet(ModelViewSet):
         return Order.objects.prefetch_related('address').filter(customer_id=customer_id)
 
 class CartViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch']
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
 
