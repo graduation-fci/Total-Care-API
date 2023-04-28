@@ -339,7 +339,7 @@ class ImageViewSet(ModelViewSet):
 
     @action(detail=False, methods=['DELETE'])
     def bulk_delete_images(self, request):
-        image_ids = request.data.get('image_ids')
+        image_ids = request.data.get('ids', [])
         success_ids = []
         failed_items = []
 
@@ -352,8 +352,8 @@ class ImageViewSet(ModelViewSet):
                 failed_items.append({'item': image_id, 'cause': 'Image not found'})
         
         response_data = {
-            'success_count': len(success_ids),
-            'success_ids': success_ids,
+            'deleted_count': len(success_ids),
+            'deleted_ids': success_ids,
             'fail_count': len(failed_items),
             'failed_items': failed_items
         }
