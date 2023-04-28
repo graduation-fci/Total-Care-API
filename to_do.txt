@@ -13,6 +13,7 @@
 - provide admin views for users //done //messing filters
 
 - manage permissions
+- add address to order by order_address_item ... like oreders and products.
 - add phone number to adresses and vailidate phne numbers
 
 
