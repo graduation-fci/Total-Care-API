@@ -152,7 +152,9 @@ class DrugViewSet(ModelViewSet):
     queryset = Drug.objects.all()
     serializer_class = DrugSerializer
     pagination_class = DefaultPagination
-
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['name']
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
         success_list = []
@@ -205,9 +207,10 @@ class DrugViewSet(ModelViewSet):
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
-    
     pagination_class = DefaultPagination
-
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['name', 'name_ar']
+    ordering_fields = ['name', 'name_ar']
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return CategoryGetSerializer
