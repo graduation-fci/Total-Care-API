@@ -26,8 +26,18 @@ class User(AbstractUser):
 
 
 class Person(models.Model):
+    
+    TYPE_MALE = 'M'
+    TYPE_FEMALE = 'F'
+
+    GENDER_TYPE_CHOICES = [
+        (TYPE_MALE, 'Male'),
+        (TYPE_FEMALE, 'Female')
+    ]
+    
     phone = models.CharField(max_length=255)
     birth_date = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=1, choices = GENDER_TYPE_CHOICES, null=True)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -39,8 +49,27 @@ class Person(models.Model):
 
 
 class Patient(Person):
-    #change later to selectedoptions
-    bloodType = models.CharField(max_length=255)
+    # change later to selectedoptions
+    TYPE_A_PLUS = 'A+'
+    TYPE_A_MINUS = 'A-'
+    TYPE_B_PLUS = 'B+'
+    TYPE_B_MINUS = 'B-'
+    TYPE_AB_PLUS = 'AB+'
+    TYPE_AB_MINUS = 'AB-'
+    TYPE_O_PLUS = 'O+'
+    TYPE_O_MINUS = 'O-'
+
+    BLOOD_TYPE_CHOICES = [
+        (TYPE_A_PLUS, 'A+'),
+        (TYPE_A_MINUS, 'A-'),
+        (TYPE_B_PLUS, 'B+'),
+        (TYPE_B_MINUS, 'B-'),
+        (TYPE_AB_PLUS, 'AB+'),
+        (TYPE_AB_MINUS, 'AB-'),
+        (TYPE_O_PLUS, 'O+'),
+        (TYPE_O_MINUS, 'O-')
+    ]
+    bloodType = models.CharField(max_length=3, choices = BLOOD_TYPE_CHOICES, null=True)
 
 
 
