@@ -86,7 +86,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Address
-        fields = ['id', 'street', 'city', 'description']
+        fields = ['id', 'street', 'city', 'description', 'phone']
 
 class PatientSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)

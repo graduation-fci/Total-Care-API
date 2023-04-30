@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from medicines.models import Medicine
+import phonenumbers
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -35,7 +37,16 @@ class Person(models.Model):
         (TYPE_FEMALE, 'Female')
     ]
     
-    phone = models.CharField(max_length=255)
+    def validate_phone_number(value):
+        try:
+            phone_number = phonenumbers.parse(value)
+            if not phonenumbers.is_valid_number(phone_number):
+                raise ValidationError("Invalid phone number")
+        except phonenumbers.phonenumberutil.NumberParseException:
+            raise ValidationError("Invalid phone number")
+
+    phone = models.CharField(max_length=255, validators=[validate_phone_number])
+
     birth_date = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices = GENDER_TYPE_CHOICES, null=True)
     user = models.OneToOneField(
