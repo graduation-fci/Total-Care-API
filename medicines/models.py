@@ -32,6 +32,8 @@ class Medicine(models.Model):
     inventory = models.IntegerField(validators=[MinValueValidator(0)])
     company = models.CharField(null=True, max_length=255, verbose_name="medicine company")
     parcode = models.BigIntegerField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    
 
     def __str__(self):
         return self.name

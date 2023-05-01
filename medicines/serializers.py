@@ -132,9 +132,12 @@ class MedicineSerializer(serializers.ModelSerializer):
     category = CategoryGetSerializer(many = True)
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','price','drug','company','parcode','medicine_images']
+        fields = ['id', 'name','name_ar','category','price','is_active','drug','company','parcode','medicine_images']
         drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
+    
+    
+            
 
 
 #created for updating or removing specific images from medicine
@@ -147,7 +150,7 @@ class MedicinePatchSerializer(serializers.ModelSerializer):
     category = CategoryGetSerializer(many = True)
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','price','drug','company','parcode','medicine_images']
+        fields = ['id', 'name','name_ar','category','is_active','price','drug','company','parcode','medicine_images']
         drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
 
@@ -157,7 +160,7 @@ class MedicineCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','price','drug','company','inventory','parcode','image_files']
+        fields = ['id', 'name','name_ar','category','is_active','price','drug','company','inventory','parcode','image_files']
         drug = DrugSerializer(many=True,source='drug.medicines')
 
     def create(self, validated_data):

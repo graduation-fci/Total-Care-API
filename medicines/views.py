@@ -42,7 +42,14 @@ class MedicineViewSet(ModelViewSet):
         elif self.request.method == 'POST' or self.request.method == 'PATCH' :
             return MedicineCreateSerializer
         return MedicineSerializer
-
+    
+    
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+        except:
+            raise serializers.ValidationError("Cannot delete protected object... you can deactivate it by changing the is_active")
+    
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
         
@@ -135,6 +142,7 @@ class MedicineViewSet(ModelViewSet):
         medicine_ids = request.data.get('ids', [])  # Get the list of medicine ids to delete
         deleted_medicines = []
         failed_medicines = []
+        protected_ids = []
         for medicine_id in medicine_ids:
             try:
                 medicine = Medicine.objects.get(id=medicine_id)
@@ -144,8 +152,29 @@ class MedicineViewSet(ModelViewSet):
                 failed_medicines.append({'id': medicine_id, 'error': 'Medicine not found'})
             except ProtectedError:
                 failed_medicines.append({'id': medicine_id, 'error': 'Medicine is related to other models'})
-        response_data = {'deleted': deleted_medicines,'deleted_count' : len(deleted_medicines), 'failed': failed_medicines,'failed_count': len(failed_medicines) }
+                protected_ids.append(medicine_id)
+        response_data = {'deleted': deleted_medicines,'deleted_count' : len(deleted_medicines),'protected_ids':protected_ids, 'failed': failed_medicines,'failed_count': len(failed_medicines) }
         return Response(response_data)
+    
+    @action(detail=False, methods=['post'], url_path='bulk_deactivate')
+    def bulk_deactivate(self, request):
+        medicine_ids = request.data.get('ids', [])
+        if not medicine_ids:
+            return Response({'message': 'No medicine ids provided'})
+
+        medicines_to_deactivate = Medicine.objects.filter(id__in=medicine_ids)
+        medicines_to_deactivate.update(is_active=False)
+        return Response({'message': f'{medicines_to_deactivate.count()} medicines have been deactivated'})
+    
+    @action(detail=False, methods=['post'], url_path='bulk_activate')
+    def bulk_activate(self, request):
+        medicine_ids = request.data.get('ids', [])
+        if not medicine_ids:
+            return Response({'message': 'No medicine ids provided'})
+
+        medicines_to_activate = Medicine.objects.filter(id__in=medicine_ids)
+        medicines_to_activate.update(is_active=True)
+        return Response({'message': f'{medicines_to_activate.count()} medicines have been activated'})
 
 
 class DrugViewSet(ModelViewSet):
