@@ -130,9 +130,10 @@ class CategorySerializer(serializers.ModelSerializer):
 class MedicineSerializer(serializers.ModelSerializer):
     medicine_images = ImageSerializer(many = True)
     category = CategoryGetSerializer(many = True)
+    in_stock = serializers.BooleanField(read_only=True)
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','price','is_active','drug','company','parcode','medicine_images']
+        fields = ['id', 'name','name_ar','category','price','is_active','in_stock','drug','company','parcode','medicine_images']
         drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
     
@@ -150,7 +151,7 @@ class MedicinePatchSerializer(serializers.ModelSerializer):
     category = CategoryGetSerializer(many = True)
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','is_active','price','drug','company','parcode','medicine_images']
+        fields = ['id', 'name','name_ar','category','inventory','is_active','price','drug','company','parcode','medicine_images']
         drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
 

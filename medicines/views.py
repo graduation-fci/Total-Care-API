@@ -28,7 +28,7 @@ class SimpleMedicineViewSet(ModelViewSet):
 
 
 class MedicineViewSet(ModelViewSet):
-    queryset = Medicine.objects.prefetch_related('drug').all()
+    
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = MedicineFilter
@@ -43,6 +43,12 @@ class MedicineViewSet(ModelViewSet):
             return MedicineCreateSerializer
         return MedicineSerializer
     
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Medicine.objects.prefetch_related('drug').all()
+        
+        return Medicine.objects.prefetch_related('drug').filter(is_active = True)
     
     def perform_destroy(self, instance):
         try:

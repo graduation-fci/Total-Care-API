@@ -34,6 +34,13 @@ class Medicine(models.Model):
     parcode = models.BigIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     
+    @property
+    def in_stock(self, *args, **kwargs):
+        quantity = self.inventory
+        if quantity == 0:
+            return False
+        else :
+            return True
 
     def __str__(self):
         return self.name

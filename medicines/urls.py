@@ -6,7 +6,7 @@ from . import views
 # URLConf
 
 router = routers.DefaultRouter()
-router.register('products', views.MedicineViewSet)
+router.register('products', views.MedicineViewSet,  basename='products')
 router.register('drugs', views.DrugViewSet)
 router.register('categories', views.CategoryViewSet)
 router.register('images', views.ImageViewSet)
