@@ -10,10 +10,11 @@
 - check medicine inventory when adding to shopping cart //not neccessary
 - provide admin views for  orders //ordainary //done
 - add phone number to adresses and vailidate phne numbers //done
+- manage permissions *//done
 
 - provide admin views for users //done //messing filters
 
-- manage permissions
+
 - add address to order by order_address_item ... like oreders and products.
 
 

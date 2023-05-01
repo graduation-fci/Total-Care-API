@@ -33,6 +33,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['id', 'product', 'unit_price', 'quantity']
 
+class OrderAddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Address
+        fields = ['street', 'city', 'description', 'phone']
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
@@ -65,6 +70,7 @@ class OrderSerializer(serializers.ModelSerializer):
 #             raise serializers.ValidationError("Cannot update order status for confirmed orders")
 
 class UpdateOrderSerializer(serializers.ModelSerializer):
+    #address = OrderAddressSerializer(required=False)
     class Meta:
         model = Order
         fields = ['order_status', 'address']
@@ -110,11 +116,35 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
 
         # If order status is pending, allow address update
         if order.order_status == Order.ORDER_STATUS_PENDING:
-            return value
+            # If address is not being updated, return the existing address
+            if not value:
+                return order.address
+
+            # Validate the new address and save it
+            serializer = OrderAddressSerializer(data=value)
+            serializer.is_valid(raise_exception=True)
+            address = serializer.save()
+
+            # Update the order to reference the new address
+            order.address = address
+            order.save()
+
+            return address
 
         # For other order statuses, disallow address update
         raise serializers.ValidationError("Cannot update address for non-pending orders")
 
+    # def update(self, instance, validated_data):
+    #     address_data = validated_data.pop('address', None)
+    #     instance = super().update(instance, validated_data)
+    #     if address_data:
+    #         address_serializer = OrderAddressSerializer(instance.address, data=address_data)
+    #         if address_serializer.is_valid():
+    #             address_serializer.save()
+    #             instance.address = address_serializer.instance
+    #         else:
+    #             raise serializers.ValidationError(address_serializer.errors)
+    #     return instance
 
 class CreateOrderSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
@@ -142,7 +172,12 @@ class CreateOrderSerializer(serializers.Serializer):
             cart_id = self.validated_data['cart_id']
             customer = Patient.objects.get(user_id=self.context['user_id'])
             address_id = self.validated_data['address_id']
-            order_address = Address.objects.get(id=address_id)
+            chosen_address = Address.objects.get(id=address_id)
+            
+            order_address = OrderAddress.objects.create(street= chosen_address.street,
+                                                        city= chosen_address.city,
+                                                        description= chosen_address.city,
+                                                        phone=chosen_address.phone)
 
             cart_items = CartItem.objects.select_related(
                 'product').filter(cart_id=cart_id)
@@ -153,15 +188,6 @@ class CreateOrderSerializer(serializers.Serializer):
 
             order = Order.objects.create(
                 customer=customer, address=order_address, total_price=order_total_price)
-
-            # order_items = [
-            #     OrderItem(
-            #         order=order,
-            #         product=item.product,
-            #         unit_price=item.product.price,
-            #         quantity=item.quantity
-            #     ) for item in cart_items
-            # ]
 
             order_items = []
             for item in cart_items:
