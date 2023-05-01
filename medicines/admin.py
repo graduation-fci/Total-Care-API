@@ -28,7 +28,7 @@ class MedicineAdmin(admin.ModelAdmin):
     list_display = ['__str__' , 'id','inventory','drugs_number']
     ordering = ['name']
     search_fields = ['name']
-    
+    autocomplete_fields = ['drug', 'category']
     @admin.display(ordering='drugs_number')
     def drugs_number(self, medicine):
         
