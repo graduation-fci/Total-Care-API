@@ -15,7 +15,8 @@
 - provide admin views for users //done //messing filters // done
 
 
-
+- make env variables
+- make delivry charges
 - think how to handle or mock payments and reports depends onboth above
 
 -if implement the report micro-service add uuid4 to the medication profile.
