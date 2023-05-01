@@ -40,7 +40,7 @@ class AddressViewSet(ModelViewSet):
 class PatientViewSet(ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
 
     @action(detail=False, methods=['GET', 'PUT', 'PATCH'], permission_classes=[IsAuthenticated])
@@ -58,16 +58,10 @@ class PatientViewSet(ModelViewSet):
 
 class MedicationProfileViewSet(ModelViewSet):
     pagination_class = DefaultPagination
-    # serializer_class = MedicationProfileSerializer
-    # filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['title']
+    ordering_fields = ['title']
     
-    # filterset_class = ResultFilter
-    
-
-    # def get_permissions(self):
-    #     if self.request.method in ['PATCH', 'DELETE','POST']:
-    #         return [IsAdminUser()]
-    #     return [IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

@@ -14,10 +14,13 @@ from django.db.models.deletion import ProtectedError
 from google.protobuf.json_format import MessageToDict
 from users.serializers import SimpleMedicineSerializer
 from .models import Image
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, \
+    DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
 
 
 
 class SimpleMedicineViewSet(ModelViewSet):
+    http_method_names = ['get']
     queryset = Medicine.objects.prefetch_related('drug').all()
     pagination_class = DefaultPagination
     serializer_class = SimpleMedicineSerializer
@@ -34,6 +37,11 @@ class MedicineViewSet(ModelViewSet):
     filterset_class = MedicineFilter
     search_fields = ['name']
     ordering_fields = ['name', 'price']
+    
+    def get_permissions(self):
+        if self.request.method in ['DELETE','POST','PATCH','PUT']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
 
     def get_serializer_class(self):
 
@@ -190,6 +198,12 @@ class DrugViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name']
     ordering_fields = ['name']
+    
+    def get_permissions(self):
+        if self.request.method in ['GET']:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+    
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
         success_list = []
@@ -246,6 +260,12 @@ class CategoryViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
+    
+    def get_permissions(self):
+        if self.request.method in ['GET']:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+    
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return CategoryGetSerializer
@@ -304,9 +324,6 @@ class CategoryViewSet(ModelViewSet):
 
 
 
-    
-
-
 class InteractionsViewSet(ViewSet):
     def create(self, request):
         data = request.data
@@ -352,6 +369,7 @@ class ImageViewSet(ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = UploadImageSerializer
     pagination_class = DefaultPagination
+    permission_classes = [IsAdminUser]
 
     @action(detail=False, methods=['POST'])
     def bulk_create_images(self, request):

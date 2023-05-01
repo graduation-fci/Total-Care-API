@@ -176,7 +176,7 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
         'user': 'core.serializers.UserSerializerDAB',
-        'current_user': 'core.serializers.UserSerializerDAB',
+        'current_user': 'core.serializers.normalUserSerializerDAB',
     },
     'EMAIL' : {
         'password_reset': 'djoser.email.PasswordResetEmail',

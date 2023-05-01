@@ -45,3 +45,9 @@ class UserSerializerDAB(BaseUserSerializer):
         fields = ['id', 'username', 'email', 'first_name',
                   'last_name', 'profile_type', 'is_staff', 'is_superuser','person']
         read_only_fields = ['profile_type']
+
+class normalUserSerializerDAB(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        fields = ['id', 'username', 'email', 'first_name',
+                  'last_name', 'profile_type','person']
+        read_only_fields = ['profile_type']
