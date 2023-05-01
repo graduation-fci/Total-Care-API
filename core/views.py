@@ -23,8 +23,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 
-# class FilteredUserViewSet(UserViewSet):
-#     filterset_class = UserFilter
-
-#move later to seprated users app
+class CustomUserViewSet(UserViewSet):
+    filterset_class = UserFilter
+    filter_backends = [filters.DjangoFilterBackend]
 

@@ -5,19 +5,22 @@ from djoser.urls.jwt import urlpatterns as djoserpatterns
 from django.urls import path
 from rest_framework_nested import routers
 from . import views
+from django.urls import path, include
+from .views import CustomUserViewSet
 
-# router = routers.DefaultRouter()
-# router.register(r'users', FilteredUserViewSet)
+router = routers.DefaultRouter()
+
 
 custompatterns= [
     
     re_path(r"^jwt/create/?", CustomTokenObtainPairView.as_view(), name="jwt-create"),  
 ]
 
-# router = routers.DefaultRouter()
-# router.register('/', views.FilteredUserViewSet)
+urlpatterns = [
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt'))
+]
 
+router.register(r'users', CustomUserViewSet)
 
-
-
-urlpatterns = custompatterns + djoserpatterns
+urlpatterns += custompatterns + router.urls

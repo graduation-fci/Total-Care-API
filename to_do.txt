@@ -11,16 +11,11 @@
 - provide admin views for  orders //ordainary //done
 - add phone number to adresses and vailidate phne numbers //done
 - manage permissions *//done
-
-- provide admin views for users //done //messing filters
-
-
-- add address to order by order_address_item ... like oreders and products.
+- add address to order by order_address_item ... like oreders and products. //done
+- provide admin views for users //done //messing filters // done
 
 
 
 - think how to handle or mock payments and reports depends onboth above
-
-
 
 -if implement the report micro-service add uuid4 to the medication profile.
