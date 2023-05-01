@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'djoser',
     'debug_toolbar',
     'medicines',
-    'guardian',
     'core',
     'users',
     'store',

@@ -3,8 +3,6 @@ from django.db.models.aggregates import Count
 from django.db.models.query import QuerySet
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
-from guardian.admin import GuardedModelAdmin
-from guardian.shortcuts import get_objects_for_user
 from . import models
 
 # Register your models here.
