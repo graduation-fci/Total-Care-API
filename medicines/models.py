@@ -31,7 +31,7 @@ class Medicine(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     inventory = models.IntegerField(validators=[MinValueValidator(0)])
     company = models.CharField(null=True, max_length=255, verbose_name="medicine company")
-    parcode = models.BigIntegerField(null=True)
+    parcode = models.BigIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name
