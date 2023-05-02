@@ -13,10 +13,11 @@
 - manage permissions *//done
 - add address to order by order_address_item ... like oreders and products. //done
 - provide admin views for users //done //messing filters // done
+- make delivry charges// not necessary
 
-
+// with deployment
 - make env variables
-- make delivry charges
+
 - think how to handle or mock payments and reports depends onboth above
 
 -if implement the report micro-service add uuid4 to the medication profile.

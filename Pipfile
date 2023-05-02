@@ -28,6 +28,11 @@ grpcio = "*"
 protobuf = "*"
 grpcio-tools = "*"
 phonenumbers = "*"
+pypiwin32 = "*"
+gunicorn = "*"
+google-auth = "*"
+google-auth-oauthlib = "*"
+sendgrid = "*"
 
 [dev-packages]
 
