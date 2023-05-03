@@ -38,7 +38,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = ['street', 'city', 'description', 'phone']
+        fields = ['street', 'city', 'description', 'phone','type','title']
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
