@@ -8,6 +8,16 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 
 class Address(models.Model):
+    
+    ADD_TYPE_HOME = 'Home'
+    ADD_TYPE_BUISNESS = 'Business'
+    
+    ADD_TYPE_CHOICESS = [
+        (ADD_TYPE_HOME, 'Home'),
+        (ADD_TYPE_BUISNESS, 'Business')
+    ]
+    title = models.CharField(max_length=255)
+    type = models.CharField(max_length=8, choices=ADD_TYPE_CHOICESS, default=ADD_TYPE_HOME)
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     customer = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='adresses')

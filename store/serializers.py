@@ -146,7 +146,9 @@ class CreateOrderSerializer(serializers.Serializer):
             order_address = OrderAddress.objects.create(street= chosen_address.street,
                                                         city= chosen_address.city,
                                                         description= chosen_address.city,
-                                                        phone=chosen_address.phone)
+                                                        phone=chosen_address.phone,
+                                                        type = chosen_address.type,
+                                                        title = chosen_address.title)
 
             cart_items = CartItem.objects.select_related(
                 'product').filter(cart_id=cart_id)
