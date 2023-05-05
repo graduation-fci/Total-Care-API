@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
     'djoser',
     'debug_toolbar',
     'medicines',
@@ -47,8 +48,6 @@ INSTALLED_APPS = [
     'store',
     'django_extensions',
     'drf_yasg',
-
-    
 ]
 
 MIDDLEWARE = [
@@ -168,10 +167,11 @@ DJOSER = {
     # 'USER_CREATE_PASSWORD_RETYPE': True,
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
-    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': False,
-    'SEND_CONFIRMATION_EMAIL': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': False,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'TOKEN_MODEL':None,
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
         'user': 'core.serializers.UserSerializerDAB',
