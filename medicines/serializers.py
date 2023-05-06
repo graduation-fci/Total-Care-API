@@ -67,12 +67,21 @@ class UploadImageSerializer(serializers.ModelSerializer):
         image_obj = Image.objects.create(image=image_path)
         return image_obj
 
-class CategoryGetSerializer(serializers.ModelSerializer):
+class GeneralCategoryGetSerializer(serializers.ModelSerializer):
     image = ImageSerializer()
     class Meta:
         model = Category
         fields = ['id','name','name_ar', 'image']
         depth = 1
+class CategoryGetSerializer(serializers.ModelSerializer):
+    image = ImageSerializer()
+    general_category = GeneralCategoryGetSerializer()
+    class Meta:
+        model = Category
+        fields = ['id','name','name_ar', 'image', 'general_category']
+        depth = 1
+
+
 
 class CategorySerializer(serializers.ModelSerializer):
     image_file = serializers.CharField(write_only=True, required=False)

@@ -322,6 +322,75 @@ class CategoryViewSet(ModelViewSet):
         return Response({'deleted': deleted_count})
 
 
+class GeneralCategoryViewSet(ModelViewSet):
+    queryset = GeneralCategory.objects.all()
+    pagination_class = DefaultPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['name', 'name_ar']
+    ordering_fields = ['name', 'name_ar']
+    
+    def get_permissions(self):
+        if self.request.method in ['GET']:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+    
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CategoryGetSerializer
+        return CategorySerializer
+
+    @action(detail=False, methods=['POST'])
+    def bulk_create(self, request):
+        success_list = []
+        fail_list = []
+       
+
+        for data in request.data:
+            try:
+                serializer = self.get_serializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                category = serializer.save()
+                success_list.append(category)
+            except ValidationError as e:
+                fail_list.append((data, str(e)))
+
+        response_data = {
+            'success': self.get_serializer(success_list, many=True).data,
+            'fail': fail_list,
+            'success_count': len(success_list),
+            'fail_count': len(fail_list),
+        }
+        return Response(response_data)
+
+    @action(detail=False, methods=['PATCH'])
+    def bulk_patch(self, request):
+        success_list = []
+        fail_list = []
+        for data in request.data:
+            category = self.get_queryset().filter(id=data.pop('id')).first()
+            if not category:
+                fail_list.append({'name': data['name'], 'error': 'Category does not exist'})
+                continue  # Skip if the category does not exist
+            serializer = self.get_serializer(category, data=data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                success_list.append(serializer.save())
+            except serializers.ValidationError as e:
+                fail_list.append({'name': data['name'], 'error': str(e)})
+        return Response({
+            'updated': len(success_list),
+            'failed': len(fail_list),
+            'fail_list': fail_list,
+        })
+
+    @action(detail=False, methods=['DELETE'])
+    def bulk_delete(self, request):
+        ids = request.data.get('ids', [])
+        categories = self.get_queryset().filter(id__in=ids)
+        deleted_count, _ = categories.delete()
+        return Response({'deleted': deleted_count})
+
+
 
 
 class InteractionsViewSet(ViewSet):
