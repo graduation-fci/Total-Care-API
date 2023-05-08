@@ -111,14 +111,29 @@ class CategorySerializer(serializers.ModelSerializer):
             image_content = response.content
             image_name = os.path.basename(image_file)
             in_memory_file = io.BytesIO(image_content)
-            return Image.objects.create(image=ImageFile(in_memory_file, name=image_name))
+            
+            try:
+                img=ImageFile(in_memory_file, name=image_name)
+                my_image =Image.objects.create(image=img)
+            finally:
+                img.close()
+                # os.remove(img.name)
+            return my_image
         else:
             # Image file is a file path
             try:
                 with open(image_file, 'rb') as f:
                     image_name = os.path.basename(image_file)
                     image_content = f.read()
-                    return Image.objects.create(image=ContentFile(image_content, name=image_name))
+                    
+                    try:
+                        img=ContentFile(image_content, name=image_name)
+                        my_img = Image.objects.create(image=img)
+                    finally:
+                        img.close()
+                        os.remove(img.name)
+                        
+                    return my_img
             except FileNotFoundError:
                 raise serializers.ValidationError('Image file not found')
 
@@ -204,7 +219,11 @@ class MedicineCreateSerializer(serializers.ModelSerializer):
                 img.save()
         else:
             for img in med_imgs:
-                Image.objects.create(medicine=med, image=img)
+                try:
+                    Image.objects.create(medicine=med, image=img)
+                finally:
+                    img.close()
+                    
     
     def _upload_image(self, image_file):
         if image_file.startswith('http'):

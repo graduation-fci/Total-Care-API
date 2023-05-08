@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
-
+import os
+from django.dispatch import receiver
+from django.db.models.signals import post_delete
+from django.conf import settings
 
 # Create your models here.
 
@@ -53,5 +56,10 @@ class Image(models.Model):
 
     def __str__(self):
         return self.image.name
+
+    def delete(self, *args, **kwargs):
+        # delete the image file from the file system
+        os.remove(os.path.join(settings.MEDIA_ROOT, self.image.name))
+        super().delete(*args, **kwargs)
 
 
