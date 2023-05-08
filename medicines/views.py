@@ -278,9 +278,12 @@ class CategoryViewSet(ModelViewSet):
 
         for data in request.data:
             try:
-                serializer = CategorySerializer(data=data)
+                general_category_name = data.pop('general_category', '') if request.data else ''  # Remove general_category name from request data
+                general_category = GeneralCategory.objects.get(name=general_category_name)
+                
+                serializer = self.get_serializer(data=data)
                 serializer.is_valid(raise_exception=True)
-                category = serializer.save()
+                category = serializer.save(general_category = general_category)
                 success_list.append(category)
             except ValidationError as e:
                 fail_list.append((data, str(e)))
@@ -302,10 +305,13 @@ class CategoryViewSet(ModelViewSet):
             if not category:
                 fail_list.append({'name': data['name'], 'error': 'Category does not exist'})
                 continue  # Skip if the category does not exist
+            
+            general_category_name = data.pop('general_category', '') if request.data else ''  # Remove general_category name from request data
+            general_category = GeneralCategory.objects.get(name=general_category_name)
             serializer = self.get_serializer(category, data=data, partial=True)
             try:
                 serializer.is_valid(raise_exception=True)
-                success_list.append(serializer.save())
+                success_list.append(serializer.save(general_category=general_category))
             except serializers.ValidationError as e:
                 fail_list.append({'name': data['name'], 'error': str(e)})
         return Response({
@@ -336,8 +342,8 @@ class GeneralCategoryViewSet(ModelViewSet):
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return CategoryGetSerializer
-        return CategorySerializer
+            return GeneralCategoryGetSerializer
+        return GeneralCategorySerializer
 
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):

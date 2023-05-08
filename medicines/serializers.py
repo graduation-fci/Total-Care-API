@@ -88,7 +88,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'name_ar', 'image_file']
+        fields = ['id', 'name', 'name_ar', 'image_file', 'general_category']
 
     def create(self, validated_data):
         print("entered")
@@ -131,7 +131,10 @@ class CategorySerializer(serializers.ModelSerializer):
             except FileNotFoundError:
                 raise serializers.ValidationError('Image file not found')
 
-
+class GeneralCategorySerializer(CategorySerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'name_ar', 'image_file']
 
 
 #dont post single item outside bulk create
