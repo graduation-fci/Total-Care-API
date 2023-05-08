@@ -44,12 +44,14 @@ class MedicineViewSet(ModelViewSet):
         return [IsAuthenticated()]
 
     def get_serializer_class(self):
-
-        if self.request.method == 'PATCH' and 'products' in self.request.path:
+        if self.request.method == 'PATCH' and 'bulk_patch' in self.request.path:
             return MedicineCreateSerializer
-        elif self.request.method == 'POST' or self.request.method == 'PATCH' :
+        elif self.request.method == 'PATCH' and 'products' in self.request.path and self.kwargs.get('pk') != None:
+            return MedicinePatchSerializer
+        elif self.request.method == 'POST' or self.request.method == 'PATCH':
             return MedicineCreateSerializer
         return MedicineSerializer
+
     
     def get_queryset(self):
         user = self.request.user
