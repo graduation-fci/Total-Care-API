@@ -119,12 +119,13 @@ class MedicineViewSet(ModelViewSet):
         success_list = []
         fail_list = []
         for data in request.data:
+            copy_data = list(data)
             medicine = Medicine.objects.filter(id=data.pop('id')).first()
             if not medicine:
-                fail_list.append({'name': data['name'], 'error': 'Medicine does not exist'})
+                fail_list.append({'id': data['id'], 'error': 'Medicine does not exist'})
                 continue  # Skip if the medicine does not exist
 
-            drug_names = data.pop('drug', []) if request.data else []  # Remove drug names from request data
+            drug_names = data.pop('drug', []) if 'drug' in data else []  # Check if drug field is present in request data
             drugs = []
             for drug_name in drug_names:
                 try:
@@ -133,9 +134,8 @@ class MedicineViewSet(ModelViewSet):
                     drug = Drug.objects.create(name=drug_name)
                 drugs.append(drug)
             
-            category_names = data.pop('category', []) if request.data else []  # Remove category names from request data
+            category_names = data.pop('category', []) if 'category' in data else []  # Check if category field is present in request data
             categories = []
-            
             for category_name in category_names:
                 category = Category.objects.get(name=category_name)
                 categories.append(category)
@@ -143,15 +143,25 @@ class MedicineViewSet(ModelViewSet):
 
             serializer = self.get_serializer(medicine, data=data, partial=True)
             try:
+                print(copy_data)
                 serializer.is_valid(raise_exception=True)
-                success_list.append(serializer.save(drug=drugs,category=categories))
+                if 'category' in copy_data and 'drug' in copy_data:
+                    items = serializer.save(drug=drugs,category=categories)
+                elif 'category' in copy_data:
+                    items = serializer.save(category=categories)
+                elif 'drug' in copy_data:
+                    items = serializer.save(drug=drugs)
+                else:
+                    items = serializer.save()
+                success_list.append(items)
             except serializers.ValidationError as e:
-                fail_list.append({'name': data['name'], 'error': str(e)})
+                fail_list.append({'id': data['id'], 'error': str(e)})
         return Response({
             'updated': len(success_list),
             'failed': len(fail_list),
             'fail_list': fail_list,
         })
+
 
     @action(detail=False, methods=['DELETE'])
     def bulk_delete(self, request):
