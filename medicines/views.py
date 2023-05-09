@@ -333,7 +333,7 @@ class InteractionsViewSet(ViewSet):
         
         #transformed_medicines = Operation.transform(medicines)
 
-        channel = grpc.insecure_channel('localhost:50051')
+        channel = grpc.insecure_channel('167.99.141.85:50051')
 
         my_request = graph_pb2.CheckInteractionsRequest()
         for medicine in medicines:
