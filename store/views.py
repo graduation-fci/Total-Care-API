@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from medicines.permissions import FullDjangoModelPermissions, IsAdminOrReadOnly
-from medicines.pagination import DefaultPagination
+from .pagination import DefaultPagination
 from django.db.models.aggregates import Count
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -29,7 +29,7 @@ class OrderViewSet(ModelViewSet):
     
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = OrderFilter
-    
+    pagination_class = DefaultPagination
     ordering_fields = ['placed_at']
 
     def get_serializer_class(self):
