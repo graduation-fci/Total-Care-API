@@ -7,6 +7,17 @@ DEBUG = False
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["46.101.105.19",
+                 "http://46.101.105.19/"]
 
-(DOMAIN)= ('example.com')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'totalcareapiprod',
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PASSWORD': ''
+    }
+}
+
+# (DOMAIN)= ('example.com')
