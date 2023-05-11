@@ -38,10 +38,10 @@ class MedicineViewSet(ModelViewSet):
     search_fields = ['name']
     ordering_fields = ['name', 'price']
     
-    def get_permissions(self):
-        if self.request.method in ['DELETE','POST','PATCH','PUT']:
-            return [IsAdminUser()]
-        return [IsAuthenticated()]
+    # def get_permissions(self):
+    #     if self.request.method in ['DELETE','POST','PATCH','PUT']:
+    #         return [IsAdminUser()]
+    #     return [IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH' and 'bulk_patch' in self.request.path:
@@ -211,10 +211,10 @@ class DrugViewSet(ModelViewSet):
     search_fields = ['name']
     ordering_fields = ['name']
     
-    def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [IsAuthenticated()]
-        return [IsAdminUser()]
+    # def get_permissions(self):
+    #     if self.request.method in ['GET']:
+    #         return [IsAuthenticated()]
+    #     return [IsAdminUser()]
     
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
@@ -278,10 +278,10 @@ class CategoryViewSet(ModelViewSet):
             return [IsAuthenticated()]
         return [IsAdminUser()]
     
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return CategoryGetSerializer
-        return CategorySerializer
+    # def get_serializer_class(self):
+    #     if self.request.method == 'GET':
+    #         return CategoryGetSerializer
+    #     return CategorySerializer
 
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
