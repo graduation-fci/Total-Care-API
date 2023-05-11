@@ -7,8 +7,8 @@ DEBUG = False
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
-ALLOWED_HOSTS = ["46.101.105.19",
-                 "http://46.101.105.19/"]
+ALLOWED_HOSTS = ["64.225.110.140",
+                 "http://64.225.110.140/"]
 
 DATABASES = {
     'default': {
