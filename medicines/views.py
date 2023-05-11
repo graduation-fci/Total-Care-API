@@ -273,15 +273,15 @@ class CategoryViewSet(ModelViewSet):
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
     
-    def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [IsAuthenticated()]
-        return [IsAdminUser()]
+    # def get_permissions(self):
+    #     if self.request.method in ['GET']:
+    #         return [IsAuthenticated()]
+    #     return [IsAdminUser()]
     
-    # def get_serializer_class(self):
-    #     if self.request.method == 'GET':
-    #         return CategoryGetSerializer
-    #     return CategorySerializer
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CategoryGetSerializer
+        return CategorySerializer
 
     @action(detail=False, methods=['POST'])
     def bulk_create(self, request):
