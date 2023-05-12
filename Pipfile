@@ -32,6 +32,7 @@ gunicorn = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"
 sendgrid = "*"
+whitenoise = "*"
 
 [dev-packages]
 
