@@ -55,6 +55,11 @@ class PatientViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+        elif request.method == 'PATCH':
+            serializer = PatientSerializer(Patient, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
 class MedicationProfileViewSet(ModelViewSet):
     pagination_class = DefaultPagination
