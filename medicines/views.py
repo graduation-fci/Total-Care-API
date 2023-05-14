@@ -26,7 +26,7 @@ class SimpleMedicineViewSet(ModelViewSet):
     serializer_class = SimpleMedicineSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = MedicineFilter
-    search_fields = ['name']
+    search_fields = ['name','name_ar']
     ordering_fields = ['name', 'price']
 
 
@@ -35,7 +35,7 @@ class MedicineViewSet(ModelViewSet):
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = MedicineFilter
-    search_fields = ['name']
+    search_fields = ['name','name_ar']
     ordering_fields = ['name', 'price']
     
     def get_permissions(self):
