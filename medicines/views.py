@@ -6,7 +6,7 @@ from rest_framework.viewsets import ModelViewSet , ViewSet
 from rest_framework import status
 from medicines.filters import MedicineFilter
 from .serializers import *
-from medicines.pagination import DefaultPagination
+from medicines.pagination import DefaultPagination, CategoriesPagination
 from medicines.graph_grpc import graph_pb2, graph_pb2_grpc
 import grpc
 from rest_framework.exceptions import ValidationError
@@ -268,7 +268,7 @@ class DrugViewSet(ModelViewSet):
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
-    pagination_class = DefaultPagination
+    pagination_class = CategoriesPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
