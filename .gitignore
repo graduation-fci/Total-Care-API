@@ -21,4 +21,5 @@ store/__pycache__/
 store/migrations/
 .png
 .jpg
-Keys/google outh2/client_secret_232446623243-gpvu6hb51b70cdjvmnnqebrp2h2ll6nb.apps.googleusercontent.com.json
+Keys/
+medicines/signals/__pycache__/

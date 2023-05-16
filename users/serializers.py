@@ -1,3 +1,4 @@
+import os
 from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -33,6 +34,22 @@ class SimpleMedicineSerializer(serializers.ModelSerializer):
                               source='drug.medicines')
         depth = 1
 
+class UploadImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonImage
+        fields = ['id','image']
+    
+    def handle_uploaded_file(self, file):
+        with open(os.path.join(settings.MEDIA_ROOT, file.name), 'wb+') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+        return file.name
+
+    def create(self, validated_data):
+        image = validated_data.get('image')
+        image_path = self.handle_uploaded_file(image)
+        image_obj = PersonImage.objects.create(image=image_path)
+        return image_obj
 
 class MedicationProfileGetSerializer(serializers.ModelSerializer):
     medicine = SimpleMedicineSerializer(many=True, read_only=True)

@@ -82,3 +82,19 @@ class MedicationProfileViewSet(ModelViewSet):
         patient_id = Patient.objects.only('id').get(user_id=user.id)
 
         return MedicationProfile.objects.prefetch_related('medicine').filter(patient_id = patient_id).order_by('title')
+    
+    
+class ImageViewSet(ModelViewSet):
+    
+    serializer_class = UploadImageSerializer
+    pagination_class = DefaultPagination
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return PersonImage.objects.all()
+
+        customer_id = Person.objects.only('id').get(user_id=user.id)
+        return PersonImage.objects.filter(customer_id=customer_id)

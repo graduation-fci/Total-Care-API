@@ -26,9 +26,14 @@ class User(AbstractUser):
     profile_type = models.CharField(
         max_length=3, choices=TYPE_CHOICES, null=True)
 
+class PersonImage(models.Model):
+    image = models.ImageField(upload_to='users/images')
+
+    def __str__(self):
+        return self.image.name
 
 class Person(models.Model):
-    
+    image = models.OneToOneField(PersonImage, on_delete=models.CASCADE, null=True, blank=True)
     TYPE_MALE = 'M'
     TYPE_FEMALE = 'F'
 
