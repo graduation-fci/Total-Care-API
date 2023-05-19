@@ -96,16 +96,18 @@ class CategorySerializer(serializers.ModelSerializer):
         print(image_file)
         category = super().create(validated_data)
         if image_file:
-            category.image = self._upload_image(image_file)
-            category.save()
+            new_image = self._upload_image(image_file)
+            new_image.category = category
+            new_image.save()
         return category
 
     def update(self, instance, validated_data):
         image_file = validated_data.pop('image_file', None)
         category = super().update(instance, validated_data)
         if image_file:
-            category.image = self._upload_image(image_file)
-            category.save()
+            new_image = self._upload_image(image_file)
+            new_image.category = category
+            new_image.save()
         return category
 
     def _upload_image(self, image_file):
@@ -131,10 +133,54 @@ class CategorySerializer(serializers.ModelSerializer):
             except FileNotFoundError:
                 raise serializers.ValidationError('Image file not found')
 
-class GeneralCategorySerializer(CategorySerializer):
+class GeneralCategorySerializer(serializers.ModelSerializer):
+    image_file = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = GeneralCategory
         fields = ['id', 'name', 'name_ar', 'image_file']
+    
+    def create(self, validated_data):
+        print("entered")
+        image_file = validated_data.pop('image_file', None)
+        print(image_file)
+        general_category = super().create(validated_data)
+        if image_file:
+            new_image = self._upload_image(image_file)
+            new_image.general_category = general_category
+            new_image.save()
+        return general_category
+
+    def update(self, instance, validated_data):
+        image_file = validated_data.pop('image_file', None)
+        general_category = super().update(instance, validated_data)
+        if image_file:
+            new_image = self._upload_image(image_file)
+            new_image.general_category = general_category
+            new_image.save()
+        return general_category
+
+    def _upload_image(self, image_file):
+        if str(image_file).isdigit():
+            # Image file is an ID
+            image = Image.objects.get(id=image_file)
+            return image
+        elif image_file.startswith('http'):
+            # Image file is a URL
+            response = requests.get(image_file)
+            response.raise_for_status()
+            image_content = response.content
+            image_name = os.path.basename(image_file)
+            in_memory_file = io.BytesIO(image_content)
+            return Image.objects.create(image=ImageFile(in_memory_file, name=image_name))
+        else:
+            # Image file is a file path
+            try:
+                with open(image_file, 'rb') as f:
+                    image_name = os.path.basename(image_file)
+                    image_content = f.read()
+                    return Image.objects.create(image=ContentFile(image_content, name=image_name))
+            except FileNotFoundError:
+                raise serializers.ValidationError('Image file not found')
 
 
 #dont post single item outside bulk create

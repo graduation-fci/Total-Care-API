@@ -15,12 +15,10 @@ class Drug(models.Model):
 class GeneralCategory(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name="category name")
     name_ar = models.CharField(max_length=255)
-    image = models.OneToOneField('Image', on_delete=models.CASCADE, related_name='general_category_image', null=True, blank=True)
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name="category name")
     name_ar = models.CharField(max_length=255)
-    image = models.OneToOneField('Image', on_delete=models.CASCADE, related_name='category_image', null=True, blank=True)
     general_category = models.ForeignKey(GeneralCategory, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
@@ -54,9 +52,9 @@ class Medicine(models.Model):
 
 
 class Image(models.Model):
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='medicine_images', null=True, blank=True)
-    category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name='category_image', null=True, blank=True)
-    general_category = models.OneToOneField(GeneralCategory, on_delete=models.CASCADE, related_name='category_image', null=True, blank=True)
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
+    category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name='image', null=True, blank=True)
+    general_category = models.OneToOneField(GeneralCategory, on_delete=models.CASCADE, related_name='image', null=True, blank=True)
     image = models.ImageField(upload_to='medicines/images')
 
     def __str__(self):
