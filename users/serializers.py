@@ -127,8 +127,9 @@ class PatientSerializer(serializers.ModelSerializer):
         print(image_file)
         patient = super().create(validated_data)
         if image_file:
-            patient.image = self._upload_image(image_file)
-            patient.save()
+            new_image = self._upload_image(image_file)
+            new_image.person = patient
+            new_image.save()
         return patient
 
     def update(self, instance, validated_data):
