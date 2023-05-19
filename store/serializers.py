@@ -242,3 +242,53 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ['quantity']
+
+
+
+
+class WishListItemSerializer(serializers.ModelSerializer):
+    product = StoreMedicineSerializer()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product']
+
+
+class WishListSerializer(serializers.ModelSerializer):
+    items = WishListItemSerializer(many=True, read_only=True)
+    print(items)
+    class Meta:
+        model = Cart
+        fields = ['id', 'items']
+
+
+class AddWishListItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField()
+
+    def validate_product_id(self, value):
+        if not Medicine.objects.filter(pk=value).exists():
+            raise serializers.ValidationError(
+                'No product with the given ID was found.')
+        return value
+
+    def save(self, **kwargs):
+        wishlist_id = self.context['wishlist_id']
+        product_id = self.validated_data['product_id']
+        
+
+        try:
+            wishlist_item = WishListItem.objects.get(
+                wishlist_id=wishlist_id, product_id=product_id)
+            
+            self.instance = wishlist_item
+        except WishListItem.DoesNotExist:
+            self.instance = WishListItem.objects.create(
+                wishlist_id=wishlist_id, **self.validated_data)
+
+        return self.instance
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product_id']
+
+

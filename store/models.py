@@ -90,3 +90,13 @@ class CartItem(models.Model):
 
     class Meta:
         unique_together = [['cart', 'product']]
+        
+class WishList(models.Model):
+    customer = models.OneToOneField(Patient, on_delete=models.CASCADE, related_name='wishlist')
+
+class WishListItem(models.Model):
+    wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE, related_name='wishlistitems')
+    product = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = [['wishlist', 'product']]
