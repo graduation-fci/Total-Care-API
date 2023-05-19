@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -26,14 +27,10 @@ class User(AbstractUser):
     profile_type = models.CharField(
         max_length=3, choices=TYPE_CHOICES, null=True)
 
-class PersonImage(models.Model):
-    image = models.ImageField(upload_to='users/images')
 
-    def __str__(self):
-        return self.image.name
 
 class Person(models.Model):
-    image = models.OneToOneField(PersonImage, on_delete=models.CASCADE, null=True, blank=True)
+    
     TYPE_MALE = 'M'
     TYPE_FEMALE = 'F'
 
@@ -63,6 +60,18 @@ class Person(models.Model):
     class Meta:
         ordering = ['user__first_name', 'user__last_name']
 
+class PersonImage(models.Model):
+    person = models.OneToOneField(Person, on_delete=models.CASCADE, null=True, blank=True, related_name="image")
+    image = models.ImageField(upload_to='users/images')
+
+    def __str__(self):
+        return self.image.name
+    
+    def delete(self, *args, **kwargs):
+        # delete the image file from the file system
+        os.remove(os.path.join(settings.MEDIA_ROOT, self.image.name))
+        super().delete(*args, **kwargs)
+        
 
 class Patient(Person):
     # change later to selectedoptions

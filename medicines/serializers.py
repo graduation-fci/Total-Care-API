@@ -55,22 +55,22 @@ class UploadImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['id','image']
     
-    def handle_uploaded_file(self, file):
-        with open(os.path.join(settings.MEDIA_ROOT, file.name), 'wb+') as destination:
-            for chunk in file.chunks():
-                destination.write(chunk)
-        return file.name
+    # def handle_uploaded_file(self, file):
+    #     with open(os.path.join(settings.MEDIA_ROOT, file.name), 'wb+') as destination:
+    #         for chunk in file.chunks():
+    #             destination.write(chunk)
+    #     return file.name
 
-    def create(self, validated_data):
-        image = validated_data.get('image')
-        image_path = self.handle_uploaded_file(image)
-        image_obj = Image.objects.create(image=image_path)
-        return image_obj
+    # def create(self, validated_data):
+    #     image = validated_data.get('image')
+    #     image_path = self.handle_uploaded_file(image)
+    #     image_obj = Image.objects.create(image=image_path)
+    #     return image_obj
 
 class GeneralCategoryGetSerializer(serializers.ModelSerializer):
     image = ImageSerializer()
     class Meta:
-        model = Category
+        model = GeneralCategory
         fields = ['id','name','name_ar', 'image']
         depth = 1
 class CategoryGetSerializer(serializers.ModelSerializer):
@@ -133,7 +133,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GeneralCategorySerializer(CategorySerializer):
     class Meta:
-        model = Category
+        model = GeneralCategory
         fields = ['id', 'name', 'name_ar', 'image_file']
 
 
