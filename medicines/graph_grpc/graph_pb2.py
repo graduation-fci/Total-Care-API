@@ -12,8 +12,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bgraph.proto\x12\x05proto\"\x06\n\x04Pass\"(\n\x04I18n\x12\x0f\n\x07name_en\x18\x01 \x01(\t\x12\x0f\n\x07name_ar\x18\x02 \x01(\t\"4\n\x08Medecine\x12\x19\n\x04name\x18\x01 \x01(\x0b\x32\x0b.proto.I18n\x12\r\n\x05\x64rugs\x18\x02 \x03(\t\"b\n\x0bInteraction\x12\r\n\x05\x64rugs\x18\x01 \x03(\t\x12\x1a\n\x12professionalEffect\x18\x02 \x01(\t\x12\x16\n\x0e\x63onsumerEffect\x18\x03 \x01(\t\x12\x10\n\x08severity\x18\x04 \x01(\t\"W\n\x0bPermutation\x12\x1e\n\tmedecines\x18\x01 \x03(\x0b\x32\x0b.proto.I18n\x12(\n\x0cinteractions\x18\x02 \x03(\x0b\x32\x12.proto.Interaction\">\n\x18\x43heckInteractionsRequest\x12\"\n\tmedecines\x18\x01 \x03(\x0b\x32\x0f.proto.Medecine\"E\n\x19\x43heckInteractionsResponse\x12(\n\x0cpermutations\x18\x01 \x03(\x0b\x32\x12.proto.Permutation2f\n\x0cGraphService\x12V\n\x11\x43heckInteractions\x12\x1f.proto.CheckInteractionsRequest\x1a .proto.CheckInteractionsResponseB\tZ\x07.;protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bgraph.proto\x12\x05proto\"\x06\n\x04Pass\"(\n\x04I18n\x12\x0f\n\x07name_en\x18\x01 \x01(\t\x12\x0f\n\x07name_ar\x18\x02 \x01(\t\"4\n\x08Medecine\x12\x19\n\x04name\x18\x01 \x01(\x0b\x32\x0b.proto.I18n\x12\r\n\x05\x64rugs\x18\x02 \x03(\t\"b\n\x0bInteraction\x12\r\n\x05\x64rugs\x18\x01 \x03(\t\x12\x1a\n\x12professionalEffect\x18\x02 \x01(\t\x12\x16\n\x0e\x63onsumerEffect\x18\x03 \x01(\t\x12\x10\n\x08severity\x18\x04 \x01(\t\"W\n\x0bPermutation\x12\x1e\n\tmedecines\x18\x01 \x03(\x0b\x32\x0b.proto.I18n\x12(\n\x0cinteractions\x18\x02 \x03(\x0b\x32\x12.proto.Interaction\"T\n\x18\x43heckInteractionsRequest\x12\"\n\tmedecines\x18\x01 \x03(\x0b\x32\x0f.proto.Medecine\x12\x14\n\x0cmedicationId\x18\x02 \x01(\x03\"E\n\x19\x43heckInteractionsResponse\x12(\n\x0cpermutations\x18\x01 \x03(\x0b\x32\x12.proto.Permutation2f\n\x0cGraphService\x12V\n\x11\x43heckInteractions\x12\x1f.proto.CheckInteractionsRequest\x1a .proto.CheckInteractionsResponseB\tZ\x07.;protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,9 +32,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_PERMUTATION']._serialized_start=226
   _globals['_PERMUTATION']._serialized_end=313
   _globals['_CHECKINTERACTIONSREQUEST']._serialized_start=315
-  _globals['_CHECKINTERACTIONSREQUEST']._serialized_end=377
-  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_start=379
-  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_end=448
-  _globals['_GRAPHSERVICE']._serialized_start=450
-  _globals['_GRAPHSERVICE']._serialized_end=552
+  _globals['_CHECKINTERACTIONSREQUEST']._serialized_end=399
+  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_start=401
+  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_end=470
+  _globals['_GRAPHSERVICE']._serialized_start=472
+  _globals['_GRAPHSERVICE']._serialized_end=574
 # @@protoc_insertion_point(module_scope)

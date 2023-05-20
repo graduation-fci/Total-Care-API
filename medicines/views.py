@@ -4,7 +4,9 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet , ViewSet
 from rest_framework import status
+from core.models import Patient
 from medicines.filters import MedicineFilter
+from users.models import MedicationProfile
 from .serializers import *
 from medicines.pagination import DefaultPagination
 from medicines.graph_grpc import graph_pb2, graph_pb2_grpc
@@ -12,12 +14,11 @@ import grpc
 from rest_framework.exceptions import ValidationError
 from django.db.models.deletion import ProtectedError
 from google.protobuf.json_format import MessageToDict
-from users.serializers import SimpleMedicineSerializer
+from users.serializers import MedicationProfileGetInteractionSerializer, MedicationProfileGetSerializer, SimpleMedicineSerializer
 from .models import Image
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny, \
     DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
-
-
+from rest_framework.renderers import JSONRenderer
 
 class SimpleMedicineViewSet(ModelViewSet):
     http_method_names = ['get']
@@ -35,7 +36,7 @@ class MedicineViewSet(ModelViewSet):
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = MedicineFilter
-    search_fields = ['name']
+    search_fields = ['name','name_ar']
     ordering_fields = ['name', 'price']
     
     def get_permissions(self):
@@ -44,12 +45,14 @@ class MedicineViewSet(ModelViewSet):
         return [IsAuthenticated()]
 
     def get_serializer_class(self):
-
-        if self.request.method == 'PATCH' and 'products' in self.request.path:
+        if self.request.method == 'PATCH' and 'bulk_patch' in self.request.path:
+            return MedicineCreateSerializer
+        elif self.request.method == 'PATCH' and 'products' in self.request.path and self.kwargs.get('pk') != None:
             return MedicinePatchSerializer
-        elif self.request.method == 'POST' or self.request.method == 'PATCH' :
+        elif self.request.method == 'POST' or self.request.method == 'PATCH':
             return MedicineCreateSerializer
         return MedicineSerializer
+
     
     def get_queryset(self):
         user = self.request.user
@@ -117,12 +120,13 @@ class MedicineViewSet(ModelViewSet):
         success_list = []
         fail_list = []
         for data in request.data:
+            copy_data = list(data)
             medicine = Medicine.objects.filter(id=data.pop('id')).first()
             if not medicine:
-                fail_list.append({'name': data['name'], 'error': 'Medicine does not exist'})
+                fail_list.append({'id': data['id'], 'error': 'Medicine does not exist'})
                 continue  # Skip if the medicine does not exist
 
-            drug_names = data.pop('drug', []) if request.data else []  # Remove drug names from request data
+            drug_names = data.pop('drug', []) if 'drug' in data else []  # Check if drug field is present in request data
             drugs = []
             for drug_name in drug_names:
                 try:
@@ -131,9 +135,8 @@ class MedicineViewSet(ModelViewSet):
                     drug = Drug.objects.create(name=drug_name)
                 drugs.append(drug)
             
-            category_names = data.pop('category', []) if request.data else []  # Remove category names from request data
+            category_names = data.pop('category', []) if 'category' in data else []  # Check if category field is present in request data
             categories = []
-            
             for category_name in category_names:
                 category = Category.objects.get(name=category_name)
                 categories.append(category)
@@ -141,15 +144,25 @@ class MedicineViewSet(ModelViewSet):
 
             serializer = self.get_serializer(medicine, data=data, partial=True)
             try:
+                print(copy_data)
                 serializer.is_valid(raise_exception=True)
-                success_list.append(serializer.save(drug=drugs,category=categories))
+                if 'category' in copy_data and 'drug' in copy_data:
+                    items = serializer.save(drug=drugs,category=categories)
+                elif 'category' in copy_data:
+                    items = serializer.save(category=categories)
+                elif 'drug' in copy_data:
+                    items = serializer.save(drug=drugs)
+                else:
+                    items = serializer.save()
+                success_list.append(items)
             except serializers.ValidationError as e:
-                fail_list.append({'name': data['name'], 'error': str(e)})
+                fail_list.append({'id': data['id'], 'error': str(e)})
         return Response({
             'updated': len(success_list),
             'failed': len(fail_list),
             'fail_list': fail_list,
         })
+
 
     @action(detail=False, methods=['DELETE'])
     def bulk_delete(self, request):
@@ -406,9 +419,10 @@ class InteractionsViewSet(ViewSet):
         
         #transformed_medicines = Operation.transform(medicines)
 
-        channel = grpc.insecure_channel('localhost:50051')
+        channel = grpc.insecure_channel('167.99.141.85:50051')
 
         my_request = graph_pb2.CheckInteractionsRequest()
+        print(MessageToDict(my_request))
         for medicine in medicines:
             name_en = medicine.get('name', '')
             name_ar = medicine.get('name_ar', '')
@@ -418,9 +432,19 @@ class InteractionsViewSet(ViewSet):
             my_med = graph_pb2.Medecine(name=graph_pb2.I18n(name_en=name_en,name_ar=name_ar), drugs=drugs)
             
             my_request.medecines.extend([my_med])
+            
+        if data['id'] != None:
+            print("hey")
+            my_request.medicationId = data['id'] 
+        else:
+            print("hello")
+            my_request.medicationId = 0
+            
+        print(my_request.medicationId)
+
 
         stub = graph_pb2_grpc.GraphServiceStub(channel)
-
+        
     
         response = stub.CheckInteractions(my_request)
         
@@ -489,3 +513,67 @@ class ImageViewSet(ModelViewSet):
             'failed_items': failed_items
         }
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class ProfileInteractionsViewSet(ViewSet):
+    permission_classes = [IsAuthenticated]
+    def create(self, request):
+        data = request.data
+        id = data.get('id', int)
+        
+        user_id =self.request.user.id
+        patient = Patient.objects.get(user_id=user_id)
+        profile_ids = MedicationProfile.objects.filter(patient=patient).values_list('id', flat=True)
+
+        if id not in profile_ids:
+            raise serializers.ValidationError(
+                'not valid id') 
+        
+        print(id)
+        
+        profile = MedicationProfile.objects.prefetch_related('medicine').get(id = id)
+        
+        serialized = MedicationProfileGetInteractionSerializer(profile)
+
+        profile_json = JSONRenderer().render(serialized.data).decode('utf-8')
+        
+
+        channel = grpc.insecure_channel('167.99.141.85:50051')
+        
+        my_data = json.loads(profile_json)
+        medicines = my_data['medicine']
+        
+        my_request = graph_pb2.CheckInteractionsRequest()
+
+
+        for medicine in medicines:
+            name_en = medicine.get('name', '')
+            name_ar = medicine.get('name_ar', '')
+            drugs = [drug.get('name', '') for drug in medicine.get('drug', [])]
+
+            
+            my_med = graph_pb2.Medecine(name=graph_pb2.I18n(name_en=name_en,name_ar=name_ar), drugs=drugs)
+            
+            my_request.medecines.extend([my_med])
+            
+
+        my_request.medicationId = id
+
+            
+        print(my_request.medicationId)
+
+
+        stub = graph_pb2_grpc.GraphServiceStub(channel)
+        
+    
+        response = stub.CheckInteractions(my_request)
+        
+        response_dict = MessageToDict(response)
+        response_dict['notification'] = {
+                                    'en': 'Hello',
+                                    'ar': 'Hello'
+                                }
+
+        return Response(response_dict, status=status.HTTP_200_OK)

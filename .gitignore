@@ -15,11 +15,15 @@ core/signals/__pycache__/
 medicines/graph_grpc/__pycache__/
 users/migrations/
 
+
 media/
-media.rar
 store/__pycache__/
 store/migrations/
 .png
 .jpg
 Keys/
 medicines/signals/__pycache__/
+Keys/google outh2/client_secret_232446623243-gpvu6hb51b70cdjvmnnqebrp2h2ll6nb.apps.googleusercontent.com.json
+medicines/signals/__pycache__/handlels.cpython-311.pyc
+
+media.rar
