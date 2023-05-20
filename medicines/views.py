@@ -346,6 +346,7 @@ class InteractionsViewSet(ViewSet):
         channel = grpc.insecure_channel('167.99.141.85:50051')
 
         my_request = graph_pb2.CheckInteractionsRequest()
+        print(MessageToDict(my_request))
         for medicine in medicines:
             name_en = medicine.get('name', '')
             name_ar = medicine.get('name_ar', '')
@@ -355,9 +356,19 @@ class InteractionsViewSet(ViewSet):
             my_med = graph_pb2.Medecine(name=graph_pb2.I18n(name_en=name_en,name_ar=name_ar), drugs=drugs)
             
             my_request.medecines.extend([my_med])
+            
+        if data['id'] != None:
+            print("hey")
+            my_request.medicationId = data['id'] 
+        else:
+            print("hello")
+            my_request.medicationId = 0
+            
+        print(my_request.medicationId)
+
 
         stub = graph_pb2_grpc.GraphServiceStub(channel)
-
+        
     
         response = stub.CheckInteractions(my_request)
         
