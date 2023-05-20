@@ -10,6 +10,6 @@ carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
 carts_router.register('items', views.CartItemViewSet, basename='cart-items')
 
 wishlists_router = routers.NestedDefaultRouter(router, 'wishlists', lookup='wishlist')
-wishlists_router.register('items', views.WishListItemViewSet, basename='wishlistitems')
+wishlists_router.register('items', views.WishListItemViewSet, basename='wishlist-items')
 
-urlpatterns = router.urls + carts_router.urls
+urlpatterns = router.urls + carts_router.urls + wishlists_router.urls

@@ -250,15 +250,14 @@ class WishListItemSerializer(serializers.ModelSerializer):
     product = StoreMedicineSerializer()
 
     class Meta:
-        model = CartItem
+        model = WishListItem
         fields = ['id', 'product']
 
 
 class WishListSerializer(serializers.ModelSerializer):
     items = WishListItemSerializer(many=True, read_only=True)
-    print(items)
     class Meta:
-        model = Cart
+        model = WishList
         fields = ['id', 'items']
 
 
@@ -288,7 +287,7 @@ class AddWishListItemSerializer(serializers.ModelSerializer):
         return self.instance
 
     class Meta:
-        model = CartItem
+        model = WishListItem
         fields = ['id', 'product_id']
 
 
