@@ -8,7 +8,7 @@ from core.models import Patient
 from medicines.filters import MedicineFilter
 from users.models import MedicationProfile
 from .serializers import *
-from medicines.pagination import DefaultPagination
+from medicines.pagination import DefaultPagination, CategoriesPagination
 from medicines.graph_grpc import graph_pb2, graph_pb2_grpc
 import grpc
 from rest_framework.exceptions import ValidationError
@@ -27,7 +27,7 @@ class SimpleMedicineViewSet(ModelViewSet):
     serializer_class = SimpleMedicineSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = MedicineFilter
-    search_fields = ['name']
+    search_fields = ['name','name_ar']
     ordering_fields = ['name', 'price']
 
 
@@ -269,7 +269,7 @@ class DrugViewSet(ModelViewSet):
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
-    pagination_class = DefaultPagination
+    pagination_class = CategoriesPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
