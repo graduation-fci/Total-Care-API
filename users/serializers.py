@@ -34,6 +34,14 @@ class SimpleMedicineSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class SimplestMedicineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medicine
+        fields = ['id','name', 'name_ar', 'drug']
+        drug = DrugSerializer(many=True, read_only=True,
+                              source='drug.medicines')
+        depth = 1
+
 class MedicationProfileGetSerializer(serializers.ModelSerializer):
     medicine = SimpleMedicineSerializer(many=True, read_only=True)
 
@@ -42,6 +50,13 @@ class MedicationProfileGetSerializer(serializers.ModelSerializer):
         fields = ['id','title','medicine']
         depth = 1
 
+class MedicationProfileGetInteractionSerializer(serializers.ModelSerializer):
+    medicine = SimplestMedicineSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = MedicationProfile
+        fields = ['id','title','medicine']
+        depth = 1
 
 class MedicationProfileSerializer(serializers.ModelSerializer):
 
