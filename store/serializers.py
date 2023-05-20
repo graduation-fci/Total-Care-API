@@ -10,19 +10,19 @@ from medicines.models import Medicine
 
 
 class StoreMedicineSerializer(serializers.ModelSerializer):
-    medicine_images = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
 
-    def get_medicine_images(self, obj):
+    def get_images(self, obj):
         request = self.context.get('request')
         print(request)
-        images = obj.medicine_images.all()
+        images = obj.images.all()
         if images:
             return [request.build_absolute_uri(image.image.url) for image in images]
         return []
 
     class Meta:
         model = Medicine
-        fields = ['id', 'name', 'name_ar', 'price', 'medicine_images']
+        fields = ['id', 'name', 'name_ar', 'price', 'images']
         depth = 1
 
 

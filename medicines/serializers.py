@@ -186,12 +186,12 @@ class GeneralCategorySerializer(serializers.ModelSerializer):
 #dont post single item outside bulk create
 #response with drugs equal to null
 class MedicineSerializer(serializers.ModelSerializer):
-    medicine_images = ImageSerializer(many = True)
+    images = ImageSerializer(many = True)
     category = CategoryGetSerializer(many = True)
     in_stock = serializers.BooleanField(read_only=True)
     class Meta:
         model = Medicine
-        fields = ['id', 'name','name_ar','category','price','is_active','in_stock','drug','company','parcode','medicine_images']
+        fields = ['id', 'name','name_ar','category','price','is_active','in_stock','drug','company','parcode','images']
         drug = DrugSerializer(many=True,source='drug.medicines')
         depth = 1
     
