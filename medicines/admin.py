@@ -15,7 +15,14 @@ class DrugAdmin(admin.ModelAdmin):
     list_filter = ['name']
 
 @admin.register(models.Category)
-class DrugAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['id','name']
+    ordering = ['name']
+    search_fields = ['name']
+    list_filter = ['name']
+
+@admin.register(models.GeneralCategory)
+class GeneralCategoryAdmin(admin.ModelAdmin):
     list_display = ['id','name']
     ordering = ['name']
     search_fields = ['name']

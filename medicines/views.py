@@ -8,7 +8,7 @@ from core.models import Patient
 from medicines.filters import MedicineFilter
 from users.models import MedicationProfile
 from .serializers import *
-from medicines.pagination import DefaultPagination
+from medicines.pagination import DefaultPagination, CategoriesPagination
 from medicines.graph_grpc import graph_pb2, graph_pb2_grpc
 import grpc
 from rest_framework.exceptions import ValidationError
@@ -27,7 +27,7 @@ class SimpleMedicineViewSet(ModelViewSet):
     serializer_class = SimpleMedicineSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = MedicineFilter
-    search_fields = ['name']
+    search_fields = ['name','name_ar']
     ordering_fields = ['name', 'price']
 
 
@@ -269,7 +269,7 @@ class DrugViewSet(ModelViewSet):
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
-    pagination_class = DefaultPagination
+    pagination_class = CategoriesPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
@@ -291,9 +291,12 @@ class CategoryViewSet(ModelViewSet):
 
         for data in request.data:
             try:
-                serializer = CategorySerializer(data=data)
+                general_category_name = data.pop('general_category', '') if request.data else ''  # Remove general_category name from request data
+                general_category = GeneralCategory.objects.get(name=general_category_name)
+                
+                serializer = self.get_serializer(data=data)
                 serializer.is_valid(raise_exception=True)
-                category = serializer.save()
+                category = serializer.save(general_category = general_category)
                 success_list.append(category)
             except ValidationError as e:
                 fail_list.append((data, str(e)))
@@ -312,6 +315,78 @@ class CategoryViewSet(ModelViewSet):
         fail_list = []
         for data in request.data:
             category = Category.objects.filter(id=data.pop('id')).first()
+            if not category:
+                fail_list.append({'name': data['name'], 'error': 'Category does not exist'})
+                continue  # Skip if the category does not exist
+            
+            general_category_name = data.pop('general_category', '') if request.data else ''  # Remove general_category name from request data
+            general_category = GeneralCategory.objects.get(name=general_category_name)
+            serializer = self.get_serializer(category, data=data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                success_list.append(serializer.save(general_category=general_category))
+            except serializers.ValidationError as e:
+                fail_list.append({'name': data['name'], 'error': str(e)})
+        return Response({
+            'updated': len(success_list),
+            'failed': len(fail_list),
+            'fail_list': fail_list,
+        })
+
+    @action(detail=False, methods=['DELETE'])
+    def bulk_delete(self, request):
+        ids = request.data.get('ids', [])
+        categories = self.get_queryset().filter(id__in=ids)
+        deleted_count, _ = categories.delete()
+        return Response({'deleted': deleted_count})
+
+
+class GeneralCategoryViewSet(ModelViewSet):
+    queryset = GeneralCategory.objects.all()
+    pagination_class = DefaultPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['name', 'name_ar']
+    ordering_fields = ['name', 'name_ar']
+    
+    def get_permissions(self):
+        if self.request.method in ['GET']:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+    
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return GeneralCategoryGetSerializer
+        return GeneralCategorySerializer
+
+    @action(detail=False, methods=['POST'])
+    def bulk_create(self, request):
+        success_list = []
+        fail_list = []
+       
+
+        for data in request.data:
+            try:
+                serializer = self.get_serializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                category = serializer.save()
+                success_list.append(category)
+            except ValidationError as e:
+                fail_list.append((data, str(e)))
+
+        response_data = {
+            'success': self.get_serializer(success_list, many=True).data,
+            'fail': fail_list,
+            'success_count': len(success_list),
+            'fail_count': len(fail_list),
+        }
+        return Response(response_data)
+
+    @action(detail=False, methods=['PATCH'])
+    def bulk_patch(self, request):
+        success_list = []
+        fail_list = []
+        for data in request.data:
+            category = self.get_queryset().filter(id=data.pop('id')).first()
             if not category:
                 fail_list.append({'name': data['name'], 'error': 'Category does not exist'})
                 continue  # Skip if the category does not exist

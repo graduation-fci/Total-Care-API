@@ -42,13 +42,18 @@ class PatientViewSet(ModelViewSet):
     serializer_class = PatientSerializer
     permission_classes = [IsAdminUser]
 
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     context['request'] = self.request
+    #     context['user_id']= self.request.user.id
+    #     return context
 
     @action(detail=False, methods=['GET', 'PUT', 'PATCH'], permission_classes=[IsAuthenticated])
     def me(self, request):
         Patient = self.queryset.get(
             user_id=request.user.id)
         if request.method == 'GET':
-            serializer = PatientGetSerializer(Patient)
+            serializer = PatientGetSerializer(Patient, context={'request': request},)
             return Response(serializer.data)
         elif request.method == 'PUT':
             serializer = PatientSerializer(Patient, data=request.data)
@@ -87,3 +92,19 @@ class MedicationProfileViewSet(ModelViewSet):
         patient_id = Patient.objects.only('id').get(user_id=user.id)
 
         return MedicationProfile.objects.prefetch_related('medicine').filter(patient_id = patient_id).order_by('title')
+    
+    
+class ImageViewSet(ModelViewSet):
+    
+    serializer_class = UploadImageSerializer
+    pagination_class = DefaultPagination
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return PersonImage.objects.all()
+
+        person = Person.objects.get(user_id=user.id)
+        return PersonImage.objects.filter(person = person)

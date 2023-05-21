@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import PersonImage, User , Person
 
 
 # Register your models here.
@@ -31,3 +31,10 @@ class UserAdmin(BaseUserAdmin):
         )
     
 
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ['id']
+
+@admin.register(PersonImage)
+class PersonImageAdmin(admin.ModelAdmin):
+    list_display = ['id']

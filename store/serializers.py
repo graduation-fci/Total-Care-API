@@ -10,19 +10,19 @@ from medicines.models import Medicine
 
 
 class StoreMedicineSerializer(serializers.ModelSerializer):
-    medicine_images = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
 
-    def get_medicine_images(self, obj):
+    def get_images(self, obj):
         request = self.context.get('request')
         print(request)
-        images = obj.medicine_images.all()
+        images = obj.images.all()
         if images:
             return [request.build_absolute_uri(image.image.url) for image in images]
         return []
 
     class Meta:
         model = Medicine
-        fields = ['id', 'name', 'name_ar', 'price', 'medicine_images']
+        fields = ['id', 'name', 'name_ar', 'price', 'images']
         depth = 1
 
 
@@ -242,3 +242,52 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ['quantity']
+
+
+
+
+class WishListItemSerializer(serializers.ModelSerializer):
+    product = StoreMedicineSerializer()
+
+    class Meta:
+        model = WishListItem
+        fields = ['id', 'product']
+
+
+class WishListSerializer(serializers.ModelSerializer):
+    items = WishListItemSerializer(many=True, read_only=True)
+    class Meta:
+        model = WishList
+        fields = ['id', 'items']
+
+
+class AddWishListItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField()
+
+    def validate_product_id(self, value):
+        if not Medicine.objects.filter(pk=value).exists():
+            raise serializers.ValidationError(
+                'No product with the given ID was found.')
+        return value
+
+    def save(self, **kwargs):
+        wishlist_id = self.context['wishlist_id']
+        product_id = self.validated_data['product_id']
+        
+
+        try:
+            wishlist_item = WishListItem.objects.get(
+                wishlist_id=wishlist_id, product_id=product_id)
+            
+            self.instance = wishlist_item
+        except WishListItem.DoesNotExist:
+            self.instance = WishListItem.objects.create(
+                wishlist_id=wishlist_id, **self.validated_data)
+
+        return self.instance
+
+    class Meta:
+        model = WishListItem
+        fields = ['id', 'product_id']
+
+

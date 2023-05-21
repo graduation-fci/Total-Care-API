@@ -32,3 +32,10 @@ class OrderAdmin(admin.ModelAdmin):
 #             return queryset.filter(inventory__lt=10)
 
 
+@admin.register(models.WishList)
+class wishlistAdmin(admin.ModelAdmin):
+    list_display = ['id']
+    
+@admin.register(models.Cart)
+class CARTistAdmin(admin.ModelAdmin):
+    list_display = ['id']

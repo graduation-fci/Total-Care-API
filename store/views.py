@@ -101,3 +101,38 @@ class CartItemViewSet(ModelViewSet):
     
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
+    
+
+class WishListViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch']
+    queryset = WishList.objects.prefetch_related('items__product').all()
+    serializer_class = WishListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return WishList.objects.all()
+
+        customer_id = Patient.objects.only('id').get(user_id=user.id)
+        return WishList.objects.filter(customer_id=customer_id)
+
+
+class WishListItemViewSet(ModelViewSet):
+    http_method_names = ['get', 'post','delete']
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddWishListItemSerializer
+        return WishListItemSerializer
+
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        context['user_id'] = self.request.user.id
+        context['wishlist_id'] = self.kwargs['wishlist_pk']
+        return context
+    
+    def get_queryset(self):
+        return WishListItem.objects.filter(wishlist_id=self.kwargs['wishlist_pk']).select_related('product')

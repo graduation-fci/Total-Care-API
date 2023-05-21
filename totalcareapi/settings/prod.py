@@ -3,10 +3,21 @@ from .common import *
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["64.225.110.140",
+                 "http://64.225.110.140/"]
 
-(DOMAIN)= ('example.com')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'totalcareapiprod',
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PASSWORD': ''
+    }
+}
+
+# (DOMAIN)= ('example.com')
