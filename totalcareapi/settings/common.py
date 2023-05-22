@@ -71,6 +71,7 @@ INTERNAL_IPS = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8001',
+    'http://totalcare.theta.com.co/',
     'http://localhost:8000',
     'http://127.0.0.1:8001',
     'http://127.0.0.1:8000',
@@ -172,7 +173,7 @@ DJOSER = {
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': True,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
     'TOKEN_MODEL':None,
