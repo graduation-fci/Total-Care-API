@@ -343,7 +343,7 @@ class CategoryViewSet(ModelViewSet):
 
 class GeneralCategoryViewSet(ModelViewSet):
     queryset = GeneralCategory.objects.all()
-    pagination_class = DefaultPagination
+    pagination_class = CategoriesPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
