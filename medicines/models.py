@@ -18,6 +18,9 @@ class Drug(models.Model):
 class GeneralCategory(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name="category name")
     name_ar = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return self.name
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name="category name")
