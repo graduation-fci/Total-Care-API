@@ -1,5 +1,5 @@
 from django_filters.rest_framework import FilterSet
-from .models import Medicine
+from .models import Medicine, Category
 import django_filters
 from django.db.models import Case, When, BooleanField
 
@@ -21,3 +21,9 @@ class MedicineFilter(FilterSet):
       else:
           queryset = queryset.filter(inventory=0)
       return queryset
+class CategoryFilter(FilterSet):
+    class Meta:
+        model = Category
+        fields = {
+            'general_category': ['exact'],
+        }

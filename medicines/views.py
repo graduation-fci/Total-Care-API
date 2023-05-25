@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet , ViewSet
 from rest_framework import status
 from core.models import Patient
-from medicines.filters import MedicineFilter
+from medicines.filters import CategoryFilter, MedicineFilter
 from users.models import MedicationProfile
 from .serializers import *
 from medicines.pagination import DefaultPagination, CategoriesPagination
@@ -271,6 +271,7 @@ class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     pagination_class = CategoriesPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = CategoryFilter
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
     
