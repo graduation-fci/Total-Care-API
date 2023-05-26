@@ -39,10 +39,10 @@ class MedicineViewSet(ModelViewSet):
     search_fields = ['name','name_ar']
     ordering_fields = ['name', 'price']
     
-    def get_permissions(self):
-        if self.request.method in ['DELETE','POST','PATCH','PUT']:
-            return [IsAdminUser()]
-        return [IsAuthenticated()]
+    # def get_permissions(self):
+    #     if self.request.method in ['DELETE','POST','PATCH','PUT']:
+    #         return [IsAdminUser()]
+    #     return [IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH' and 'bulk_patch' in self.request.path:
@@ -275,10 +275,10 @@ class CategoryViewSet(ModelViewSet):
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
     
-    def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [IsAuthenticated()]
-        return [IsAdminUser()]
+    # def get_permissions(self):
+    #     if self.request.method in ['GET']:
+    #         return [IsAuthenticated()]
+    #     return [IsAdminUser()]
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -349,10 +349,10 @@ class GeneralCategoryViewSet(ModelViewSet):
     search_fields = ['name', 'name_ar']
     ordering_fields = ['name', 'name_ar']
     
-    def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [IsAuthenticated()]
-        return [IsAdminUser()]
+    # def get_permissions(self):
+    #     if self.request.method in ['GET']:
+    #         return [IsAuthenticated()]
+    #     return [IsAdminUser()]
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
