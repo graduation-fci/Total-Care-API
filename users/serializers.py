@@ -27,7 +27,7 @@ class SimpleMedicineSerializer(serializers.ModelSerializer):
 
     def get_medicine_images(self, obj):
         request = self.context.get('request')
-        images = obj.medicine_images.all()
+        images = obj.images.all()
         if images:
             return [request.build_absolute_uri(image.image.url) for image in images]
         return []
