@@ -39,24 +39,23 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
     'djoser',
     'debug_toolbar',
     'medicines',
-    'guardian',
     'core',
     'users',
     'store',
     'allauth',
     'django_extensions',
     'drf_yasg',
-
-    
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,7 +72,9 @@ INTERNAL_IPS = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8001',
+    'http://localhost:8000',
     'http://127.0.0.1:8001',
+    'http://127.0.0.1:8000',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
     'http://localhost:3000',
@@ -141,6 +142,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -151,7 +153,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 'guardian.backends.ObjectPermissionBackend')
+
 
 
 REST_FRAMEWORK = {
@@ -164,21 +166,22 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'core.User'
 
 
-(SITE_NAME)= ('E-Exam')
+(SITE_NAME)= ('Total-care')
 
 DJOSER = {
     # 'USER_CREATE_PASSWORD_RETYPE': True,
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': True,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'TOKEN_MODEL':None,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8001'],
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
-        'user': 'core.serializers.UserCreateSerializer',
-        'current_user': 'core.serializers.UserSerializerDAB',
+        'user': 'core.serializers.UserSerializerDAB',
+        'current_user': 'core.serializers.normalUserSerializerDAB',
     },
     'EMAIL' : {
         'password_reset': 'djoser.email.PasswordResetEmail',

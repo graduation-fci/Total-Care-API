@@ -49,6 +49,8 @@ class UserCreateSerializer(BaseUserCreateSerializer):
     profile_type = serializers.ChoiceField(choices=User.TYPE_CHOICES, required=True, help_text=_('Required. Must be one of PAT, DR, CL, PHC.'), label=_('Profile Type'))
     
     class Meta(BaseUserCreateSerializer.Meta):
+        fields = ['id', 'username', 'password', 'email',
+                  'first_name', 'last_name', 'profile_type']
         model = User
         fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name', 'profile_type']
 
@@ -66,6 +68,15 @@ class UserCreateSerializer(BaseUserCreateSerializer):
 
 class UserSerializerDAB(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
+        fields = ['id', 'username', 'email', 'first_name',
+                  'last_name', 'profile_type', 'is_staff', 'is_superuser','person']
+        read_only_fields = ['profile_type']
+
+class normalUserSerializerDAB(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        fields = ['id', 'username', 'email', 'first_name',
+                  'last_name', 'profile_type','person']
+        read_only_fields = ['profile_type']
         fields = ['id', 'username', 'email',
                   'first_name', 'last_name', 'profile_type']
     

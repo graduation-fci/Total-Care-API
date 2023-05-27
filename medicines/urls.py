@@ -6,11 +6,14 @@ from . import views
 # URLConf
 
 router = routers.DefaultRouter()
-router.register('products', views.MedicineViewSet)
+router.register('products', views.MedicineViewSet,  basename='products')
 router.register('drugs', views.DrugViewSet)
 router.register('categories', views.CategoryViewSet)
+router.register('general_categories', views.GeneralCategoryViewSet)
+router.register('images', views.ImageViewSet)
 router.register('simple_meds', views.SimpleMedicineViewSet, basename='simple_meds')
 router.register('interactions', views.InteractionsViewSet, basename='interactions')
+router.register('profile-interactions', views.ProfileInteractionsViewSet, basename='profile-interactions')
 
 # urlpatterns = [
 #     path('medicine/products/bulk_create/', views.MedicineViewSet.as_view({'post': 'bulk_create'}), name='medicine-bulk-create'),

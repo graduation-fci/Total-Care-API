@@ -11,14 +11,19 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthentic
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+from djoser.views import UserViewSet
 from .filters import *
 from .serializers import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import *
+from .filters import UserFilter
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-#move later to seprated users app
+
+class CustomUserViewSet(UserViewSet):
+    filterset_class = UserFilter
+    filter_backends = [filters.DjangoFilterBackend]
 

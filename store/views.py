@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from medicines.permissions import FullDjangoModelPermissions, IsAdminOrReadOnly
-from medicines.pagination import DefaultPagination
+from .pagination import DefaultPagination
 from django.db.models.aggregates import Count
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -12,6 +12,10 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthentic
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+
+from store.filters import OrderFilter
+
+
 from .serializers import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import *
@@ -22,7 +26,11 @@ from rest_framework.viewsets import GenericViewSet
     
 class OrderViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
-
+    
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = OrderFilter
+    pagination_class = DefaultPagination
+    ordering_fields = ['placed_at']
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -38,7 +46,7 @@ class OrderViewSet(ModelViewSet):
         return context
     
     def get_permissions(self):
-        if self.request.method in ['PATCH', 'DELETE']:
+        if self.request.method in ['DELETE']:
             return [IsAdminUser()]
         return [IsAuthenticated()]
 
@@ -53,13 +61,13 @@ class OrderViewSet(ModelViewSet):
         user = self.request.user
 
         if user.is_staff:
-            return Order.objects.all()
+            return Order.objects.prefetch_related('address').all()
 
         customer_id = Patient.objects.only('id').get(user_id=user.id)
-        return Order.objects.filter(customer_id=customer_id)
+        return Order.objects.prefetch_related('address').filter(customer_id=customer_id)
 
 class CartViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch']
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
 
@@ -93,3 +101,38 @@ class CartItemViewSet(ModelViewSet):
     
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
+    
+
+class WishListViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch']
+    queryset = WishList.objects.prefetch_related('items__product').all()
+    serializer_class = WishListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return WishList.objects.all()
+
+        customer_id = Patient.objects.only('id').get(user_id=user.id)
+        return WishList.objects.filter(customer_id=customer_id)
+
+
+class WishListItemViewSet(ModelViewSet):
+    http_method_names = ['get', 'post','delete']
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddWishListItemSerializer
+        return WishListItemSerializer
+
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        context['user_id'] = self.request.user.id
+        context['wishlist_id'] = self.kwargs['wishlist_pk']
+        return context
+    
+    def get_queryset(self):
+        return WishListItem.objects.filter(wishlist_id=self.kwargs['wishlist_pk']).select_related('product')

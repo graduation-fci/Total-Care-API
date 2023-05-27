@@ -3,8 +3,6 @@ from django.db.models.aggregates import Count
 from django.db.models.query import QuerySet
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
-from guardian.admin import GuardedModelAdmin
-from guardian.shortcuts import get_objects_for_user
 from . import models
 
 # Register your models here.
@@ -17,7 +15,14 @@ class DrugAdmin(admin.ModelAdmin):
     list_filter = ['name']
 
 @admin.register(models.Category)
-class DrugAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['id','name']
+    ordering = ['name']
+    search_fields = ['name']
+    list_filter = ['name']
+
+@admin.register(models.GeneralCategory)
+class GeneralCategoryAdmin(admin.ModelAdmin):
     list_display = ['id','name']
     ordering = ['name']
     search_fields = ['name']
@@ -28,7 +33,7 @@ class MedicineAdmin(admin.ModelAdmin):
     list_display = ['__str__' , 'id','inventory','drugs_number']
     ordering = ['name']
     search_fields = ['name']
-    
+    autocomplete_fields = ['drug', 'category']
     @admin.display(ordering='drugs_number')
     def drugs_number(self, medicine):
         

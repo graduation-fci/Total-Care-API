@@ -3,32 +3,72 @@ from django.db import models
 from core.models import Patient
 from medicines.models import Medicine
 from django.core.validators import MinValueValidator
-
-from users.models import Address
-
-
+import phonenumbers
+from django.core.exceptions import ValidationError
 
 
+
+
+class OrderAddress(models.Model):
+    
+    ADD_TYPE_HOME = 'Home'
+    ADD_TYPE_BUISNESS = 'Business'
+    
+    ADD_TYPE_CHOICESS = [
+        (ADD_TYPE_HOME, 'Home'),
+        (ADD_TYPE_BUISNESS, 'Business')
+    ]
+    title = models.CharField(max_length=255)
+    type = models.CharField(max_length=8, choices=ADD_TYPE_CHOICESS, default=ADD_TYPE_HOME)
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+
+    description = models.TextField(null=True, blank=True)
+    
+    def validate_phone_number(value):
+        try:
+            phone_number = phonenumbers.parse(value)
+            if not phonenumbers.is_valid_number(phone_number):
+                raise ValidationError("Invalid phone number")
+        except phonenumbers.phonenumberutil.NumberParseException:
+            raise ValidationError("Invalid phone number")
+
+    phone = models.CharField(max_length=255, validators=[validate_phone_number])
 
 class Order(models.Model):
-    PAYMENT_STATUS_PENDING = 'P'
-    PAYMENT_STATUS_COMPLETE = 'C'
-    PAYMENT_STATUS_FAILED = 'F'
-    PAYMENT_STATUS_CHOICES = [
-        (PAYMENT_STATUS_PENDING, 'Pending'),
-        (PAYMENT_STATUS_COMPLETE, 'Complete'),
-        (PAYMENT_STATUS_FAILED, 'Failed')
+    PAYMENT_METHOD_CASH = 'COD'
+    PAYMENT_METHOD_VISA = 'VIS'
+    PAYMENT_METHOD_CREDIT = 'CRD'
+    PAYMENT_METHOD_CHOICES = [
+        (PAYMENT_METHOD_CASH, 'cash on delivery'),
+        (PAYMENT_METHOD_VISA, 'visa'),
+        (PAYMENT_METHOD_CREDIT, 'site credit')
     ]
+    
+    ORDER_STATUS_PENDING = 'PEN'
+    ORDER_STATUS_CONFIRMED = 'CON'
+    ORDER_STATUS_COMPLETE = 'COM'
+    ORDER_STATUS_CANCELED = 'CAN'
+    ORDER_STATUS_CHOICES = [
+        (ORDER_STATUS_PENDING, 'Pending'),
+        (ORDER_STATUS_CONFIRMED, 'Confirmed'),
+        (ORDER_STATUS_COMPLETE, 'Complete'),
+        (ORDER_STATUS_CANCELED, 'Canceled')
+    ]
+    
+    
 
     placed_at = models.DateTimeField(auto_now_add=True)
-    payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING)
+    payment_method = models.CharField(max_length=3, choices=PAYMENT_METHOD_CHOICES, default=PAYMENT_METHOD_CASH)
+    order_status = models.CharField(max_length=3, choices=ORDER_STATUS_CHOICES, default=ORDER_STATUS_PENDING)
     customer = models.ForeignKey(Patient, on_delete=models.PROTECT, related_name='orders')
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    address = models.ForeignKey(Address, on_delete=models.PROTECT, related_name='order')
+    address = models.OneToOneField(OrderAddress, on_delete=models.CASCADE, related_name='order')
 
 
     class Meta:
         permissions = [('cancel_order', 'Can cancel order')]
+
 
 
 
@@ -41,7 +81,7 @@ class OrderItem(models.Model):
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
-    customer = models.OneToOneField(Patient, on_delete=models.PROTECT, related_name='cart')
+    customer = models.OneToOneField(Patient, on_delete=models.CASCADE, related_name='cart')
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
@@ -50,3 +90,13 @@ class CartItem(models.Model):
 
     class Meta:
         unique_together = [['cart', 'product']]
+        
+class WishList(models.Model):
+    customer = models.OneToOneField(Patient, on_delete=models.CASCADE, related_name='wishlist')
+
+class WishListItem(models.Model):
+    wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = [['wishlist', 'product']]
