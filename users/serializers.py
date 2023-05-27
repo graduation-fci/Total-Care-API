@@ -133,7 +133,7 @@ class PatientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = ['id', 'user_id', 'phone', 'birth_date', 'profiles', 'bloodType', 'image_file']
+        fields = ['id', 'user_id', 'phone', 'birth_date', 'profiles', 'bloodType', 'image_file','gender']
         # MedicationProfile = MedicationProfileSerializer(many=True, read_only=True, source='drug.medicines')
         depth = 1
 
@@ -188,5 +188,5 @@ class PatientGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = ['id', 'user_id', 'phone', 'birth_date', 'profiles', 'image']
+        fields = ['id', 'user_id', 'phone', 'birth_date', 'profiles', 'image','gender','bloodType']
         depth = 1
