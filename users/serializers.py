@@ -40,6 +40,7 @@ class SimpleMedicineSerializer(serializers.ModelSerializer):
 
 class UploadImageSerializer(serializers.ModelSerializer):
     class Meta:
+        ref_name = 'UsersUploadImageSerializer'
         model = PersonImage
         fields = ['id','image']
     
