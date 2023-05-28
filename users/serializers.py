@@ -190,3 +190,17 @@ class PatientGetSerializer(serializers.ModelSerializer):
         model = Patient
         fields = ['id', 'user_id', 'phone', 'birth_date', 'profiles', 'image','gender','bloodType']
         depth = 1
+
+class SearchHistorySerializer(serializers.ModelSerializer):
+    
+    
+    def create(self, validated_data):
+        user_id = self.context['user_id']
+        searrch_item = SearchHistory.objects.create(user_id=user_id, **validated_data)
+        
+        return searrch_item
+        
+        
+    class Meta:
+        model = SearchHistory
+        fields = ['id','query', 'timestamp']

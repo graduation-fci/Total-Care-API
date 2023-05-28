@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthentic
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+
+from users.pagination import SearchHistoryPagination
 from .filters import *
 from .serializers import *
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -108,3 +110,20 @@ class ImageViewSet(ModelViewSet):
 
         person = Person.objects.get(user_id=user.id)
         return PersonImage.objects.filter(person = person)
+
+class SearchHistoryViewSet(ModelViewSet):
+       
+    http_method_names = ['get', 'post','delete']
+    permission_classes = [IsAuthenticated] 
+    serializer_class = SearchHistorySerializer
+    pagination_class = SearchHistoryPagination
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        context['user_id']= self.request.user.id
+        return context
+    
+    def get_queryset(self):
+        user = self.request.user
+        return SearchHistory.objects.filter(user=user).order_by('-timestamp')

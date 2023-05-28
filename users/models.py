@@ -1,4 +1,5 @@
 from django.db import models
+from core.filters import User
 from core.models import Patient
 from medicines.models import Medicine
 import phonenumbers
@@ -6,6 +7,14 @@ from django.core.exceptions import ValidationError
 
 
 # Create your models here.
+
+class SearchHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    query = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
 
 class Address(models.Model):
     
