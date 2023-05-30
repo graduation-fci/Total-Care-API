@@ -321,11 +321,18 @@ class CategoryViewSet(ModelViewSet):
                 continue  # Skip if the category does not exist
             
             general_category_name = data.pop('general_category', '') if request.data else ''  # Remove general_category name from request data
-            general_category = GeneralCategory.objects.get(name=general_category_name)
+            try:
+                general_category = GeneralCategory.objects.get(name=general_category_name)
+            except:
+                general_category = None
             serializer = self.get_serializer(category, data=data, partial=True)
             try:
                 serializer.is_valid(raise_exception=True)
-                success_list.append(serializer.save(general_category=general_category))
+                if general_category is not None:
+                    success_list.append(serializer.save(general_category=general_category))
+                else:
+                    success_list.append(serializer.save())
+                    
             except serializers.ValidationError as e:
                 fail_list.append({'name': data['name'], 'error': str(e)})
         return Response({
