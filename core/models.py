@@ -47,7 +47,7 @@ class Person(models.Model):
         except phonenumbers.phonenumberutil.NumberParseException:
             raise ValidationError("Invalid phone number")
 
-    phone = models.CharField(max_length=255, validators=[validate_phone_number])
+    phone = models.CharField(max_length=255, null=True, blank=True, validators=[validate_phone_number,])
 
     birth_date = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices = GENDER_TYPE_CHOICES, null=True)
