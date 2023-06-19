@@ -539,7 +539,7 @@ class ProfileInteractionsViewSet(ViewSet):
             raise serializers.ValidationError(
                 'not valid id') 
         
-        print(id)
+        #print(id)
         
         profile = MedicationProfile.objects.prefetch_related('medicine').get(id = id)
         
@@ -569,19 +569,17 @@ class ProfileInteractionsViewSet(ViewSet):
 
         my_request.medicationId = id
 
-            
-        print(my_request.medicationId)
+        # print(my_request)    
+        # print(my_request.medicationId)
 
 
         stub = graph_pb2_grpc.GraphServiceStub(channel)
         
     
         response = stub.CheckInteractions(my_request)
-        
+        print(response)
         response_dict = MessageToDict(response)
-        response_dict['notification'] = {
-                                    'en': 'Hello',
-                                    'ar': 'Hello'
-                                }
+        # print(response_dict)
+        
 
         return Response(response_dict, status=status.HTTP_200_OK)

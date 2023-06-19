@@ -12,7 +12,8 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bgraph.proto\x12\x05proto\"\x06\n\x04Pass\"(\n\x04I18n\x12\x0f\n\x07name_en\x18\x01 \x01(\t\x12\x0f\n\x07name_ar\x18\x02 \x01(\t\"4\n\x08Medecine\x12\x19\n\x04name\x18\x01 \x01(\x0b\x32\x0b.proto.I18n\x12\r\n\x05\x64rugs\x18\x02 \x03(\t\"b\n\x0bInteraction\x12\r\n\x05\x64rugs\x18\x01 \x03(\t\x12\x1a\n\x12professionalEffect\x18\x02 \x01(\t\x12\x16\n\x0e\x63onsumerEffect\x18\x03 \x01(\t\x12\x10\n\x08severity\x18\x04 \x01(\t\"W\n\x0bPermutation\x12\x1e\n\tmedecines\x18\x01 \x03(\x0b\x32\x0b.proto.I18n\x12(\n\x0cinteractions\x18\x02 \x03(\x0b\x32\x12.proto.Interaction\"T\n\x18\x43heckInteractionsRequest\x12\"\n\tmedecines\x18\x01 \x03(\x0b\x32\x0f.proto.Medecine\x12\x14\n\x0cmedicationId\x18\x02 \x01(\x03\"E\n\x19\x43heckInteractionsResponse\x12(\n\x0cpermutations\x18\x01 \x03(\x0b\x32\x12.proto.Permutation2f\n\x0cGraphService\x12V\n\x11\x43heckInteractions\x12\x1f.proto.CheckInteractionsRequest\x1a .proto.CheckInteractionsResponseB\tZ\x07.;protob\x06proto3')
+
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bgraph.proto\x12\x05proto\"\x06\n\x04Pass\"(\n\x04I18n\x12\x0f\n\x07name_en\x18\x01 \x01(\t\x12\x0f\n\x07name_ar\x18\x02 \x01(\t\"&\n\x0cNotification\x12\n\n\x02\x65n\x18\x01 \x01(\t\x12\n\n\x02\x61r\x18\x02 \x01(\t\"4\n\x08Medecine\x12\x19\n\x04name\x18\x01 \x01(\x0b\x32\x0b.proto.I18n\x12\r\n\x05\x64rugs\x18\x02 \x03(\t\"b\n\x0bInteraction\x12\r\n\x05\x64rugs\x18\x01 \x03(\t\x12\x1a\n\x12professionalEffect\x18\x02 \x01(\t\x12\x16\n\x0e\x63onsumerEffect\x18\x03 \x01(\t\x12\x10\n\x08severity\x18\x04 \x01(\t\"W\n\x0bPermutation\x12\x1e\n\tmedecines\x18\x01 \x03(\x0b\x32\x0b.proto.I18n\x12(\n\x0cinteractions\x18\x02 \x03(\x0b\x32\x12.proto.Interaction\"T\n\x18\x43heckInteractionsRequest\x12\"\n\tmedecines\x18\x01 \x03(\x0b\x32\x0f.proto.Medecine\x12\x14\n\x0cmedicationId\x18\x02 \x01(\x03\"p\n\x19\x43heckInteractionsResponse\x12(\n\x0cpermutations\x18\x01 \x03(\x0b\x32\x12.proto.Permutation\x12)\n\x0cnotification\x18\x02 \x01(\x0b\x32\x13.proto.Notification2f\n\x0cGraphService\x12V\n\x11\x43heckInteractions\x12\x1f.proto.CheckInteractionsRequest\x1a .proto.CheckInteractionsResponseB\tZ\x07.;protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -25,16 +26,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_PASS']._serialized_end=28
   _globals['_I18N']._serialized_start=30
   _globals['_I18N']._serialized_end=70
-  _globals['_MEDECINE']._serialized_start=72
-  _globals['_MEDECINE']._serialized_end=124
-  _globals['_INTERACTION']._serialized_start=126
-  _globals['_INTERACTION']._serialized_end=224
-  _globals['_PERMUTATION']._serialized_start=226
-  _globals['_PERMUTATION']._serialized_end=313
-  _globals['_CHECKINTERACTIONSREQUEST']._serialized_start=315
-  _globals['_CHECKINTERACTIONSREQUEST']._serialized_end=399
-  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_start=401
-  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_end=470
-  _globals['_GRAPHSERVICE']._serialized_start=472
-  _globals['_GRAPHSERVICE']._serialized_end=574
+  _globals['_NOTIFICATION']._serialized_start=72
+  _globals['_NOTIFICATION']._serialized_end=110
+  _globals['_MEDECINE']._serialized_start=112
+  _globals['_MEDECINE']._serialized_end=164
+  _globals['_INTERACTION']._serialized_start=166
+  _globals['_INTERACTION']._serialized_end=264
+  _globals['_PERMUTATION']._serialized_start=266
+  _globals['_PERMUTATION']._serialized_end=353
+  _globals['_CHECKINTERACTIONSREQUEST']._serialized_start=355
+  _globals['_CHECKINTERACTIONSREQUEST']._serialized_end=439
+  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_start=441
+  _globals['_CHECKINTERACTIONSRESPONSE']._serialized_end=553
+  _globals['_GRAPHSERVICE']._serialized_start=555
+  _globals['_GRAPHSERVICE']._serialized_end=657
 # @@protoc_insertion_point(module_scope)
