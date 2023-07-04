@@ -427,7 +427,7 @@ class InteractionsViewSet(ViewSet):
         
         #transformed_medicines = Operation.transform(medicines)
 
-        channel = grpc.insecure_channel('167.99.141.85:50051')
+        channel = grpc.insecure_channel('147.182.249.244:50051')
 
         my_request = graph_pb2.CheckInteractionsRequest()
         print(MessageToDict(my_request))
@@ -548,7 +548,7 @@ class ProfileInteractionsViewSet(ViewSet):
         profile_json = JSONRenderer().render(serialized.data).decode('utf-8')
         
 
-        channel = grpc.insecure_channel('167.99.141.85:50051')
+        channel = grpc.insecure_channel('147.182.249.244:50051')
         
         my_data = json.loads(profile_json)
         medicines = my_data['medicine']
